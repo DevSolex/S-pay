@@ -156,3 +156,13 @@ describe("S-pay Protocol: Merchant Withdrawals", () => {
     expect(json).toBeDefined();
   });
 });
+
+describe("S-pay Protocol: Platform Fees and Metrics", () => {
+  it("tracks global metrics correctly", () => {
+    const { result } = simnet.callReadOnlyFn("s-pay", "get-global-metrics", [], DEPLOYER);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+    expect(json.value.value['total-users']).toBeDefined();
+    expect(json.value.value['total-merchants']).toBeDefined();
+  });
+});
