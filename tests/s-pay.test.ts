@@ -42,3 +42,22 @@ describe("S-pay Protocol: User Registration", () => {
     expect(json.success).toBe(false);
   });
 });
+
+describe("S-pay Protocol: Merchant Registration", () => {
+  it("allows registered user to become a merchant with stake", () => {
+    const wallet = accounts.get("wallet_5")!;
+    simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii("merchant1")], wallet);
+    const { result } = simnet.callPublicFn("s-pay", "register-merchant",
+      [Cl.stringAscii("My Business"), Cl.stringAscii("https://mybiz.com")], wallet);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+  });
+
+  it("prevents non-users from registering as merchants", () => {
+    const wallet = accounts.get("wallet_6")!;
+    const { result } = simnet.callPublicFn("s-pay", "register-merchant",
+      [Cl.stringAscii("Business"), Cl.stringAscii("https://test.com")], wallet);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(false);
+  });
+});
