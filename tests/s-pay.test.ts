@@ -122,3 +122,22 @@ describe("S-pay Protocol: Payment Processing", () => {
     expect(json.success).toBe(false);
   });
 });
+
+describe("S-pay Protocol: Vault Operations", () => {
+  it("allows users to deposit STX into vault", () => {
+    const wallet = accounts.get("wallet_13")!;
+    simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii("vaultuser1")], wallet);
+    const { result } = simnet.callPublicFn("s-pay", "vault-deposit", [Cl.uint(5000000)], wallet);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+  });
+
+  it("allows users to withdraw STX from vault", () => {
+    const wallet = accounts.get("wallet_14")!;
+    simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii("vaultuser2")], wallet);
+    simnet.callPublicFn("s-pay", "vault-deposit", [Cl.uint(3000000)], wallet);
+    const { result } = simnet.callPublicFn("s-pay", "vault-withdraw", [Cl.uint(1000000)], wallet);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+  });
+});
