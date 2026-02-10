@@ -1,21 +1,20 @@
 
 import { describe, expect, it } from "vitest";
+import { cvToJSON } from "@stacks/transactions";
 
 const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
+const DEPLOYER = accounts.get("deployer")!;
 
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
-
-describe("example tests", () => {
+describe("S-pay Protocol: Initialization", () => {
   it("ensures simnet is well initialised", () => {
     expect(simnet.blockHeight).toBeDefined();
   });
 
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
+  it("checks initial protocol status", () => {
+    const { result } = simnet.callReadOnlyFn("s-pay", "get-protocol-status", [], DEPLOYER);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+    expect(json.value.value.version.value).toBe("1.0.0");
+    expect(json.value.value.paused.value).toBe(false);
+  });
 });
