@@ -310,6 +310,39 @@
     )
 )
 
-;; private functions
-;;
+;; --- Authorization Helpers ---
+
+;; @desc Change the protocol pause state (Admin Only)
+;; @param pause bool - New pause state
+(define-public (set-paused (pause bool))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-OWNER)
+        (var-set is-paused pause)
+        (print { event: "protocol-pause-updated", paused: pause })
+        (ok true)
+    )
+)
+
+;; @desc Update the treasury address (Admin Only)
+;; @param new-receiver principal - The new fee collection address
+(define-public (set-fee-receiver (new-receiver principal))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-OWNER)
+        (var-set fee-receiver new-receiver)
+        (print { event: "fee-receiver-updated", receiver: new-receiver })
+        (ok true)
+    )
+)
+
+;; @desc Update the protocol fee (Admin Only)
+;; @param new-fee uint - New fee in basis points
+(define-public (set-fee-percentage (new-fee uint))
+    (begin
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-OWNER)
+        (asserts! (<= new-fee MAX-FEE-PERCENT) ERR-INVALID-FEE)
+        (var-set fee-percentage new-fee)
+        (print { event: "fee-percentage-updated", fee: new-fee })
+        (ok true)
+    )
+)
 
