@@ -680,6 +680,72 @@
     )
 )
 
+
+;; --- Merchant Revenue Tracking ---
+
+;; @desc Merchant-specific withdrawal of earned revenue
+;; @param amount uint - Micro-STX to withdraw from processed payments
+(define-public (merchant-withdraw (amount uint))
+    (let (
+        (merchant (unwrap! (map-get? Merchants tx-sender) ERR-MERCHANT-NOT-FOUND))
+        (current-revenue (get total-revenue merchant))
+    )
+        ;; Basic validation
+        (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
+        (asserts! (<= amount current-revenue) ERR-INSUFFICIENT-FUNDS)
+        (asserts! (is-eq (get status merchant) "verified") ERR-UNAUTHORIZED)
+
+        ;; Transfer STX from contract to merchant
+        (try! (as-contract (stx-transfer? amount (as-contract tx-sender) tx-sender)))
+
+        ;; Update merchant record
+        (map-set Merchants tx-sender (merge merchant { 
+            total-revenue: (- current-revenue amount) 
+        }))
+
+        ;; Log the revenue withdrawal
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "MERCHANT-WITHDRAWAL",
+                actor: tx-sender,
+                payload: "Merchant revenue settlement completed",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+
+        (print { event: "merchant-withdrawal", merchant: tx-sender, amount: amount })
+        (ok true)
+    )
+)
+
+;; @desc Reclaim verification stake (Verified Merchants Only)
+(define-public (reclaim-stake)
+    (let (
+        (merchant (unwrap! (map-get? Merchants tx-sender) ERR-MERCHANT-NOT-FOUND))
+    )
+        ;; Only verified merchants can reclaim stake after successful onboarding
+        (asserts! (is-eq (get status merchant) "verified") ERR-UNAUTHORIZED)
+        (asserts! (>= (stx-get-balance (as-contract tx-sender)) MERCHANT-VERIFICATION-STAKE) ERR-INSUFFICIENT-FUNDS)
+
+        ;; Return stake
+        (try! (as-contract (stx-transfer? MERCHANT-VERIFICATION-STAKE (as-contract tx-sender) tx-sender)))
+
+        ;; Log stake reclamation
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "STAKE-RECLAIM",
+                actor: tx-sender,
+                payload: "Verification stake returned to merchant",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+
+        (ok true)
+    )
+)
+
 ;; --- Private Functions ---
 
 ;; @desc Calculate the platform fee based on the amount
