@@ -15,14 +15,14 @@ if (!privateKey) {
 }
 
 const network = STACKS_MAINNET;
-const contractContent = readFileSync('contracts/s-pay.clar', 'utf8');
 
-async function deploy() {
-    console.log("Preparing deployment transaction for contract 's-pay'...");
+async function deployContract(contractName, filePath) {
+    console.log(`Preparing deployment transaction for contract '${contractName}'...`);
+    const contractContent = readFileSync(filePath, 'utf8');
 
     try {
         const txOptions = {
-            contractName: 's-pay',
+            contractName: contractName,
             codeBody: contractContent,
             senderKey: privateKey,
             network,
@@ -33,21 +33,41 @@ async function deploy() {
         };
 
         const transaction = await makeContractDeploy(txOptions);
-        console.log("Broadcasting transaction...");
+        console.log(`Broadcasting transaction for ${contractName}...`);
         const response = await broadcastTransaction({ transaction, network });
 
         if (response.error) {
-            console.error("Deployment failed:", response.error);
+            console.error(`Deployment of ${contractName} failed:`, response.error);
             if (response.reason) console.error("Reason:", response.reason);
-            if (response.message) console.error("Message:", response.message);
+            return null;
         } else {
-            console.log("Deployment transaction broadcast successfully!");
+            console.log(`Deployment of ${contractName} broadcast successfully!`);
             console.log("Transaction ID:", response.txid);
-            console.log(`Explorer: https://explorer.hiro.so/txid/0x${response.txid}?chain=mainnet`);
+            return response.txid;
         }
     } catch (error) {
-        console.error("Error during deployment:", error);
+        console.error(`Error during deployment of ${contractName}:`, error);
+        return null;
     }
 }
 
-deploy().catch(console.error);
+async function runDeployments() {
+    // 1. Deploy Trait
+    const traitTxId = await deployContract('sip-010-trait', 'contracts/sip-010-trait.clar');
+    if (!traitTxId) return;
+
+    // 2. Deploy Token
+    // We might need to wait for the trait to be confirmed or at least in the mempool 
+    // for the token to be valid. In some cases, we might need a brief delay.
+    console.log("Waiting 5 seconds before broadcasting token deployment...");
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    const tokenTxId = await deployContract('s-pay-token', 'contracts/s-pay-token.clar');
+    if (tokenTxId) {
+        console.log("\nAll deployments broadcast!");
+        console.log(`Trait Tx: https://explorer.hiro.so/txid/0x${traitTxId}?chain=mainnet`);
+        console.log(`Token Tx: https://explorer.hiro.so/txid/0x${tokenTxId}?chain=mainnet`);
+    }
+}
+
+runDeployments().catch(console.error);
