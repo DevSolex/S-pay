@@ -1,6 +1,6 @@
 
 import { describe, expect, it } from "vitest";
-import { cvToJSON } from "@stacks/transactions";
+import { cvToJSON, Cl } from "@stacks/transactions";
 
 const accounts = simnet.getAccounts();
 const DEPLOYER = accounts.get("deployer")!;
@@ -16,5 +16,22 @@ describe("S-pay Protocol: Initialization", () => {
     expect(json.success).toBe(true);
     expect(json.value.value.version.value).toBe("1.0.0");
     expect(json.value.value.paused.value).toBe(false);
+  });
+});
+
+describe("S-pay Protocol: User Registration", () => {
+  it("allows a new user to register with a unique username", () => {
+    const username = "alice";
+    const { result } = simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii(username)], accounts.get("wallet_1")!);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+  });
+
+  it("prevents duplicate username registration", () => {
+    const username = "bob";
+    simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii(username)], accounts.get("wallet_2")!);
+    const { result } = simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii(username)], accounts.get("wallet_3")!);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(false);
   });
 });
