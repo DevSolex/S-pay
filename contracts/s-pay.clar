@@ -40,8 +40,37 @@
 (define-constant CONTRACT-VERSION "1.0.0")
 (define-constant PLATFORM-TAG "SPAY-PROTO")
 
-;; data vars
-;;
+;; --- Data Variables ---
+
+;; The primary administrator address that can update protocol settings
+(define-data-var contract-owner principal tx-sender)
+
+;; A safety switch to halt sensitive operations in case of emergency
+(define-data-var is-paused bool false)
+
+;; The treasury address where platform fees are directed
+(define-data-var fee-receiver principal tx-sender)
+
+;; Current platform fee in basis points (e.g., 200 = 2%)
+(define-data-var fee-percentage uint u200)
+
+;; Scaling counter for user registrations to ensure unique indexing
+(define-data-var user-nonce uint u0)
+
+;; Scaling counter for merchant registrations and profile tracking
+(define-data-var merchant-nonce uint u0)
+
+;; Total transaction volume processed by the protocol in micro-STX
+(define-data-var total-volume uint u0)
+
+;; Total platform fees collected since deployment
+(define-data-var total-fees-collected uint u0)
+
+;; Global switch for merchant verification requirements
+(define-data-var require-merchant-verification bool true)
+
+;; Maximum allowed transaction volume per single payment
+(define-data-var max-payment-amount (optional uint) none)
 
 ;; data maps
 ;;
