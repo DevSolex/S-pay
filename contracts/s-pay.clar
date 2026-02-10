@@ -1028,6 +1028,69 @@
     )
 )
 
+        (ok true)
+    )
+)
+
+;; --- Bulk Transfer Utility ---
+
+;; Helper structure for batch processing
+(define-private (process-payment-iter (payment { recipient: principal, amount: uint }) (previous-results (list 10 bool)))
+    (let (
+        (res (process-payment (get amount payment) (get recipient payment)))
+    )
+        (unwrap-panic (as-max-len? (append previous-results (is-ok res)) u10))
+    )
+)
+
+;; @desc Process up to 10 payments in a single transaction
+;; @param payments (list 10 { recipient: principal, amount: uint }) - Batch of payments
+(define-public (process-bulk-payment (payments (list 10 { recipient: principal, amount: uint })))
+    (let (
+        (batch-size (len payments))
+        (results (fold process-payment-iter payments (list)))
+    )
+        ;; Basic validation
+        (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
+        (asserts! (> batch-size u0) ERR-INVALID-AMOUNT)
+
+        ;; Log the bulk operation
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "BULK-PAYMENT",
+                actor: tx-sender,
+                payload: (concat "Batch payment processed for " (int-to-ascii batch-size)),
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+
+        (print { event: "bulk-payment-processed", count: batch-size, results: results })
+        (ok results)
+    )
+)
+
+;; @desc Admin function to emergency clear blacklist items (Admin Only)
+;; @param accounts (list 50 principal) - Batch of accounts to unblock
+(define-public (bulk-unblacklist (accounts (list 50 principal)))
+    (begin
+        (asserts! (is-owner) ERR-NOT-OWNER)
+        
+        ;; Log the bulk security action
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "BULK-UNBLACKLIST",
+                actor: tx-sender,
+                payload: "Batch restriction removal executed",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+        
+        (ok (map unblacklist-address accounts))
+    )
+)
+
 ;; --- Private Functions ---
 
 ;; @desc Calculate the platform fee based on the amount
