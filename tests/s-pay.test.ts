@@ -61,3 +61,25 @@ describe("S-pay Protocol: Merchant Registration", () => {
     expect(json.success).toBe(false);
   });
 });
+
+describe("S-pay Protocol: Merchant Admin Functions", () => {
+  it("allows admin to verify merchants", () => {
+    const wallet = accounts.get("wallet_7")!;
+    simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii("merchant2")], wallet);
+    simnet.callPublicFn("s-pay", "register-merchant",
+      [Cl.stringAscii("Business 2"), Cl.stringAscii("https://biz2.com")], wallet);
+    const { result } = simnet.callPublicFn("s-pay", "verify-merchant", [Cl.principal(wallet)], DEPLOYER);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+  });
+
+  it("allows admin to suspend merchants", () => {
+    const wallet = accounts.get("wallet_8")!;
+    simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii("merchant3")], wallet);
+    simnet.callPublicFn("s-pay", "register-merchant",
+      [Cl.stringAscii("Business 3"), Cl.stringAscii("https://biz3.com")], wallet);
+    const { result } = simnet.callPublicFn("s-pay", "suspend-merchant", [Cl.principal(wallet)], DEPLOYER);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+  });
+});
