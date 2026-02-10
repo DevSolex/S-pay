@@ -107,4 +107,18 @@ describe("S-pay Protocol: Payment Processing", () => {
     // Volume should be greater than 0 after previous payment
     expect(parseInt(json.value.value['total-volume'].value)).toBeGreaterThan(0);
   });
+
+  it("rejects payments to unverified merchants", () => {
+    const merchant = accounts.get("wallet_11")!;
+    const customer = accounts.get("wallet_12")!;
+    simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii("merchant5")], merchant);
+    simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii("customer2")], customer);
+    simnet.callPublicFn("s-pay", "register-merchant",
+      [Cl.stringAscii("Unverified"), Cl.stringAscii("https://unverified.com")], merchant);
+
+    const { result } = simnet.callPublicFn("s-pay", "process-payment",
+      [Cl.principal(merchant), Cl.uint(500000), Cl.stringAscii("Order")], customer);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(false);
+  });
 });
