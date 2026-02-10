@@ -72,11 +72,130 @@
 ;; Maximum allowed transaction volume per single payment
 (define-data-var max-payment-amount (optional uint) none)
 
-;; data maps
-;;
+;; --- Data Maps ---
 
-;; public functions
-;;
+;; User Records - maps principal to a unique user-id and registration data
+(define-map Users
+    principal
+    {
+        user-id: uint,
+        username: (string-ascii 24),
+        status: (string-ascii 12), ;; "active", "suspended"
+        registered-at: uint,
+        total-spent: uint,
+        total-received: uint,
+        is-merchant: bool
+    }
+)
+
+;; Username Lookup - maps username to principal to ensure uniqueness
+(define-map Usernames
+    (string-ascii 24)
+    principal
+)
+
+;; --- Public Functions ---
+
+;; @desc Register a new user in the protocol
+;; @param username (string-ascii 24) - A unique display name for the user
+(define-public (register-user (username (string-ascii 24)))
+    (let (
+        (new-id (+ (var-get user-nonce) u1))
+    )
+        ;; Check if contract is paused
+        (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
+
+        ;; Check if user is already registered
+        (asserts! (is-none (map-get? Users tx-sender)) ERR-ALREADY-REGISTERED)
+
+        ;; Check if username is already taken
+        (asserts! (is-none (map-get? Usernames username)) ERR-ALREADY-REGISTERED)
+
+        ;; Optional: Handle registration fee if enabled
+        (if (> REGISTRATION-FEE-STX u0)
+            (try! (stx-transfer? REGISTRATION-FEE-STX tx-sender (var-get fee-receiver)))
+            true
+        )
+
+        ;; Store user record
+        (map-set Users tx-sender {
+            user-id: new-id,
+            username: username,
+            status: "active",
+            registered-at: stacks-block-height,
+            total-spent: u0,
+            total-received: u0,
+            is-merchant: false
+        })
+
+        ;; Merchant Records - maps principal to their business details
+(define-map Merchants
+    principal
+    {
+        merchant-id: uint,
+        business-name: (string-ascii 64),
+        description: (string-ascii 256),
+        website: (string-ascii 128),
+        status: (string-ascii 12), ;; "pending", "verified", "suspended"
+        tier: (string-ascii 12), ;; "basic", "premium", "enterprise"
+        total-revenue: uint,
+        dispute-count: uint,
+        metadata-hash: (buff 32)
+    }
+)
+
+;; --- Public Functions ---
+
+;; @desc Register as a merchant to receive professional payments
+;; @param business-name (string-ascii 64) - The legal or brand name
+;; @param website (string-ascii 128) - Official business website
+(define-public (register-merchant (business-name (string-ascii 64)) (website (string-ascii 128)))
+    (let (
+        (user (unwrap! (map-get? Users tx-sender) ERR-USER-NOT-FOUND))
+        (new-id (+ (var-get merchant-nonce) u1))
+    )
+        ;; Check if contract is paused
+        (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
+
+        ;; Check if already a merchant
+        (asserts! (is-none (map-get? Merchants tx-sender)) ERR-ALREADY-REGISTERED)
+
+        ;; Basic verification stake if required
+        (if (var-get require-merchant-verification)
+            (try! (stx-transfer? MERCHANT-VERIFICATION-STAKE tx-sender (as-contract tx-sender)))
+            true
+        )
+
+        ;; Store merchant profile
+        (map-set Merchants tx-sender {
+            merchant-id: new-id,
+            business-name: business-name,
+            description: "",
+            website: website,
+            status: (if (var-get require-merchant-verification) "pending" "verified"),
+            tier: "basic",
+            total-revenue: u0,
+            dispute-count: u0,
+            metadata-hash: 0x0000000000000000000000000000000000000000000000000000000000000000
+        })
+
+        ;; Update user record to reflect merchant status
+        (map-set Users tx-sender (merge user { is-merchant: true }))
+
+        ;; Increment merchant nonce
+        (var-set merchant-nonce new-id)
+
+        ;; Emit merchant registration event
+        (print {
+            event: "merchant-registered",
+            merchant: tx-sender,
+            merchant-id: new-id,
+            business-name: business-name
+        })
+
+        (ok new-id)
+    )
+)
 
 ;; read only functions
 ;;
