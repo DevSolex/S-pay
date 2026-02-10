@@ -746,6 +746,60 @@
     )
 )
 
+        (ok true)
+    )
+)
+
+;; --- Fee and Metrics Management ---
+
+;; @desc Settle accumulated fees to the treasury (Admin Only)
+;; @param amount uint - Micro-STX to transfer from contract to fee receiver
+(define-public (settle-platform-fees (amount uint))
+    (let (
+        (collected (var-get total-fees-collected))
+    )
+        ;; Only owner can settle fees
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-OWNER)
+        (asserts! (<= amount collected) ERR-INSUFFICIENT-FUNDS)
+
+        ;; Perform transfer to treasury
+        (try! (as-contract (stx-transfer? amount (as-contract tx-sender) (var-get fee-receiver))))
+
+        ;; Update record (decrement collected to reflect actually held fees)
+        (var-set total-fees-collected (- collected amount))
+
+        ;; Log the settlement
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "FEE-SETTLEMENT",
+                actor: tx-sender,
+                payload: "Platform fees moved to treasury",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+
+        (print { event: "fees-settled", amount: amount, treasury: (var-get fee-receiver) })
+        (ok true)
+    )
+)
+
+;; @desc Get detailed global protocol performance metrics
+(define-read-only (get-global-metrics)
+    (let (
+        (stx-balance (stx-get-balance (as-contract tx-sender)))
+    )
+        {
+            total-volume: (var-get total-volume),
+            current-fees-held: (var-get total-fees-collected),
+            active-users: (var-get user-nonce),
+            active-merchants: (var-get merchant-nonce),
+            contract-balance: stx-balance,
+            operational-status: (if (var-get is-paused) "paused" "active")
+        }
+    )
+)
+
 ;; --- Private Functions ---
 
 ;; @desc Calculate the platform fee based on the amount
