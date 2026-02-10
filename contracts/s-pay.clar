@@ -1091,6 +1091,76 @@
     )
 )
 
+        (ok (map unblacklist-address accounts))
+    )
+)
+
+;; --- Advanced Metrics & Statistics ---
+
+;; Tracks total volume per day (Day = stacks-block-height / 144)
+(define-map DailyVolume
+    { day: uint }
+    {
+        total-stx: uint,
+        tx-count: uint,
+        unique-senders: uint
+    }
+)
+
+;; Tracks historical milestones for the protocol
+(define-map ProtocolMilestones
+    { milestone-id: uint }
+    {
+        description: (string-ascii 128),
+        achieved-at: uint,
+        volume-at-milestone: uint
+    }
+)
+
+(define-data-var milestone-nonce uint u0)
+
+;; @desc Internal helper to update time-based volume tracking
+;; @param amount uint - The amount to record
+(define-private (update-volume-metrics (amount uint))
+    (let (
+        (current-day (/ stacks-block-height u144))
+        (current-stats (default-to { total-stx: u0, tx-count: u0, unique-senders: u0 } (map-get? DailyVolume { day: current-day })))
+    )
+        (map-set DailyVolume { day: current-day } {
+            total-stx: (+ (get total-stx current-stats) amount),
+            tx-count: (+ (get tx-count current-stats) u1),
+            unique-senders: (+ (get unique-senders current-stats) u1) ;; Simplified tracking
+        })
+
+        ;; Automatic milestone tracking
+        (if (>= (var-get total-volume) u10000000000) ;; 10k STX Milestone
+            (record-milestone "Reached 10,000 STX Cumulative Volume")
+            true
+        )
+    )
+)
+
+;; @desc Record a protocol achievement milestone
+;; @param desc (string-ascii 128) - Achievement description
+(define-private (record-milestone (desc (string-ascii 128)))
+    (let (
+        (new-id (+ (var-get milestone-nonce) u1))
+    )
+        (map-set ProtocolMilestones { milestone-id: new-id } {
+            description: desc,
+            achieved-at: stacks-block-height,
+            volume-at-milestone: (var-get total-volume)
+        })
+        (var-set milestone-nonce new-id)
+    )
+)
+
+;; @desc Query volume statistics for a specific day
+;; @param day uint - The day index (stacks-block-height / 144)
+(define-read-only (get-daily-stats (day uint))
+    (map-get? DailyVolume { day: day })
+)
+
 ;; --- Private Functions ---
 
 ;; @desc Calculate the platform fee based on the amount
