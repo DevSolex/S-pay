@@ -947,6 +947,87 @@
     )
 )
 
+        (ok true)
+    )
+)
+
+;; --- Security Controls (Blacklist/Whitelist) ---
+
+;; Address Blacklist - prevents compromised addresses from interacting
+(define-map BlacklistedAddresses principal bool)
+
+;; Address Whitelist - trusted partners or fee-exempt addresses
+(define-map WhitelistedAddresses principal bool)
+
+;; @desc Add an address to the protocol blacklist (Admin Only)
+;; @param account principal - The address to block
+(define-public (blacklist-address (account principal))
+    (begin
+        (asserts! (is-owner) ERR-NOT-OWNER)
+        (asserts! (not (is-eq account (var-get contract-owner))) ERR-NOT-ALLOWED)
+        
+        (map-set BlacklistedAddresses account true)
+        
+        ;; Log the security action
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "ADDRESS-BLACKLISTED",
+                actor: tx-sender,
+                payload: "Principal restricted from protocol access",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+        
+        (print { event: "address-blacklisted", account: account })
+        (ok true)
+    )
+)
+
+;; @desc Remove an address from the protocol blacklist (Admin Only)
+;; @param account principal - The address to unblock
+(define-public (unblacklist-address (account principal))
+    (begin
+        (asserts! (is-owner) ERR-NOT-OWNER)
+        (map-delete BlacklistedAddresses account)
+        
+        ;; Log the security action
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "ADDRESS-UNBLACKLISTED",
+                actor: tx-sender,
+                payload: "Principal restriction removed",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+        
+        (ok true)
+    )
+)
+
+;; @desc Add an address to the trusted whitelist (Admin Only)
+;; @param account principal - The address to trust
+(define-public (whitelist-address (account principal))
+    (begin
+        (asserts! (is-owner) ERR-NOT-OWNER)
+        (map-set WhitelistedAddresses account true)
+        
+        ;; Log the trust action
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "ADDRESS-WHITELISTED",
+                actor: tx-sender,
+                payload: "Principal added to trusted whitelist",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+        
+        (ok true)
+    )
+)
+
 ;; --- Private Functions ---
 
 ;; @desc Calculate the platform fee based on the amount
