@@ -128,7 +128,25 @@
             is-merchant: false
         })
 
-        ;; Merchant Records - maps principal to their business details
+        ;; Map username to principal
+        (map-set Usernames username tx-sender)
+
+        ;; Increment nonce
+        (var-set user-nonce new-id)
+
+        ;; Emit registration event
+        (print {
+            event: "user-registered",
+            user: tx-sender,
+            user-id: new-id,
+            username: username
+        })
+
+        (ok new-id)
+    )
+)
+
+;; Merchant Records - maps principal to their business details
 (define-map Merchants
     principal
     {
@@ -194,6 +212,50 @@
         })
 
         (ok new-id)
+    )
+)
+
+;; @desc Verify a merchant profile (Admin Only)
+;; @param merchant principal - The merchant to verify
+(define-public (verify-merchant (merchant principal))
+    (let (
+        (profile (unwrap! (map-get? Merchants merchant) ERR-MERCHANT-NOT-FOUND))
+    )
+        ;; Only contract owner can verify
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-OWNER)
+
+        ;; Update merchant status
+        (map-set Merchants merchant (merge profile { status: "verified" }))
+
+        ;; Emit verification event
+        (print {
+            event: "merchant-verified",
+            merchant: merchant
+        })
+
+        (ok true)
+    )
+)
+
+;; @desc Revoke merchant verification or suspend (Admin Only)
+;; @param merchant principal - The merchant to suspend
+(define-public (suspend-merchant (merchant principal))
+    (let (
+        (profile (unwrap! (map-get? Merchants merchant) ERR-MERCHANT-NOT-FOUND))
+    )
+        ;; Only contract owner can suspend
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-OWNER)
+
+        ;; Update merchant status
+        (map-set Merchants merchant (merge profile { status: "suspended" }))
+
+        ;; Emit suspension event
+        (print {
+            event: "merchant-suspended",
+            merchant: merchant
+        })
+
+        (ok true)
     )
 )
 
