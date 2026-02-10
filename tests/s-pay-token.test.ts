@@ -54,3 +54,21 @@ describe("S-pay Token: Transfer Operations", () => {
         expect(parseInt(json.value.value)).toBeGreaterThan(0);
     });
 });
+
+describe("S-pay Token: Minting Restrictions", () => {
+    it("prevents non-owners from minting tokens", () => {
+        const nonOwner = accounts.get("wallet_3")!;
+        const recipient = accounts.get("wallet_4")!;
+        const { result } = simnet.callPublicFn("s-pay-token", "mint",
+            [Cl.uint(1000000), Cl.principal(recipient)], nonOwner);
+        const json = cvToJSON(result) as any;
+        expect(json.success).toBe(false);
+    });
+
+    it("tracks total supply correctly", () => {
+        const { result } = simnet.callReadOnlyFn("s-pay-token", "get-total-supply", [], DEPLOYER);
+        const json = cvToJSON(result) as any;
+        expect(json.success).toBe(true);
+        expect(parseInt(json.value.value)).toBeGreaterThan(0);
+    });
+});
