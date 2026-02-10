@@ -611,6 +611,75 @@
     )
 )
 
+;; --- Vault Management ---
+
+;; Balance tracking for funds held within the protocol
+(define-map VaultBalances principal uint)
+
+;; @desc Deposit STX into the protocol vault for future use
+;; @param amount uint - Micro-STX to deposit
+(define-public (vault-deposit (amount uint))
+    (let (
+        (current-balance (default-to u0 (map-get? VaultBalances tx-sender)))
+    )
+        ;; Basic validation
+        (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
+        (asserts! (> amount u0) ERR-INVALID-AMOUNT)
+
+        ;; Transfer STX to contract
+        (try! (stx-transfer? amount tx-sender (as-contract tx-sender)))
+
+        ;; Update vault balance
+        (map-set VaultBalances tx-sender (+ current-balance amount))
+
+        ;; Log the deposit
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "VAULT-DEPOSIT",
+                actor: tx-sender,
+                payload: "Funds deposited into internal vault",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+
+        (print { event: "vault-deposit", user: tx-sender, amount: amount })
+        (ok true)
+    )
+)
+
+;; @desc Withdraw STX from the protocol vault
+;; @param amount uint - Micro-STX to withdraw
+(define-public (vault-withdraw (amount uint))
+    (let (
+        (current-balance (default-to u0 (map-get? VaultBalances tx-sender)))
+    )
+        ;; Basic validation
+        (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
+        (asserts! (<= amount current-balance) ERR-INSUFFICIENT-FUNDS)
+
+        ;; Transfer STX back to user
+        (try! (as-contract (stx-transfer? amount (as-contract tx-sender) tx-sender)))
+
+        ;; Update vault balance
+        (map-set VaultBalances tx-sender (- current-balance amount))
+
+        ;; Log the withdrawal
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "VAULT-WITHDRAW",
+                actor: tx-sender,
+                payload: "Funds withdrawn from internal vault",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+
+        (print { event: "vault-withdraw", user: tx-sender, amount: amount })
+        (ok true)
+    )
+)
+
 ;; --- Private Functions ---
 
 ;; @desc Calculate the platform fee based on the amount
