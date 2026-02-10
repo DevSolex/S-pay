@@ -99,4 +99,12 @@ describe("S-pay Protocol: Payment Processing", () => {
     const json = cvToJSON(result) as any;
     expect(json.success).toBe(true);
   });
+
+  it("tracks payment volume correctly", () => {
+    const { result } = simnet.callReadOnlyFn("s-pay", "get-protocol-status", [], DEPLOYER);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+    // Volume should be greater than 0 after previous payment
+    expect(parseInt(json.value.value['total-volume'].value)).toBeGreaterThan(0);
+  });
 });
