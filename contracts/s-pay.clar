@@ -9,6 +9,73 @@
 ;; token definitions
 ;;
 
+;; --- Read Only Functions ---
+
+;; @desc Get core protocol configuration and status
+(define-read-only (get-protocol-status)
+    (ok {
+        version: CONTRACT-VERSION,
+        paused: (var-get is-paused),
+        owner: (var-get contract-owner),
+        fee-percentage: (var-get fee-percentage),
+        total-volume: (var-get total-volume),
+        total-fees-collected: (var-get total-fees-collected),
+        require-verification: (var-get require-merchant-verification)
+    })
+)
+
+;; @desc Retrieve full user data by principal
+;; @param account principal - The user account to lookup
+(define-read-only (get-user-data (account principal))
+    (map-get? Users account)
+)
+
+;; @desc Retrieve user profile metadata
+;; @param account principal - The user account to lookup
+(define-read-only (get-user-profile (account principal))
+    (map-get? UserProfiles account)
+)
+
+;; @desc Retrieve full merchant data by principal
+;; @param account principal - The merchant account to lookup
+(define-read-only (get-merchant-data (account principal))
+    (map-get? Merchants account)
+)
+
+;; @desc Search for user principal by username
+;; @param username (string-ascii 24) - The unique username
+(define-read-only (get-principal-by-username (username (string-ascii 24)))
+    (map-get? Usernames username)
+)
+
+;; @desc Inspect a specific system event
+;; @param id uint - The event id
+(define-read-only (get-system-event (id uint))
+    (map-get? SystemEvents { event-id: id })
+)
+
+;; @desc Helper to check if a user is an active merchant
+;; @param account principal - The account to check
+(define-read-only (is-active-merchant (account principal))
+    (let (
+        (merchant (map-get? Merchants account))
+    )
+        (match merchant
+            profile (is-eq (get status profile) "verified")
+            false
+        )
+    )
+)
+
+;; @desc Get current system nonces
+(define-read-only (get-nonces)
+    {
+        users: (var-get user-nonce),
+        merchants: (var-get merchant-nonce),
+        events: (var-get event-nonce)
+    }
+)
+
 ;; Error Constants
 (define-constant ERR-UNAUTHORIZED (err u100))
 (define-constant ERR-NOT-OWNER (err u101))
