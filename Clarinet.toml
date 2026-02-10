@@ -5,9 +5,17 @@ authors = []
 telemetry = false
 cache_dir = './.cache'
 requirements = []
+[contracts.sip-010-trait]
+path = 'contracts/sip-010-trait.clar'
+clarity_version = 2
+epoch = 'latest'
 [contracts.s-pay]
 path = 'contracts/s-pay.clar'
-clarity_version = 4
+clarity_version = 2
+epoch = 'latest'
+[contracts.s-pay-token]
+path = 'contracts/s-pay-token.clar'
+clarity_version = 2
 epoch = 'latest'
 [repl.analysis]
 passes = ['check_checker']

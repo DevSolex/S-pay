@@ -189,7 +189,7 @@
             user-id: new-id,
             username: username,
             status: "active",
-            registered-at: stacks-block-height,
+            registered-at: block-height,
             total-spent: u0,
             total-received: u0,
             is-merchant: false
@@ -372,7 +372,7 @@
         (print {
             event: "profile-updated",
             user: tx-sender,
-            updated-at: stacks-block-height
+            updated-at: block-height
         })
 
         (ok true)
@@ -444,7 +444,7 @@
                 event-type: "OWNER-PROPOSED",
                 actor: tx-sender,
                 payload: "Ownership transfer initiated",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -469,7 +469,7 @@
                 event-type: "OWNER-CLAIMED",
                 actor: tx-sender,
                 payload: "Ownership transfer completed",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -494,7 +494,7 @@
                 event-type: "VERIFICATION-TOGGLE",
                 actor: tx-sender,
                 payload: (if enabled "Merchant verification enabled" "Merchant verification bypassed"),
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -524,7 +524,7 @@
                 event-type: "MAX-PAYMENT-UPDATE",
                 actor: tx-sender,
                 payload: "Payment limit constraints modified",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -545,7 +545,7 @@
                 event-type: "MERCHANT-HALT",
                 actor: tx-sender,
                 payload: "Merchant onboarding suspended immediately",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -594,7 +594,7 @@
                 event-type: "PAYMENT-PROCESSED",
                 actor: tx-sender,
                 payload: "STX payment settled with platform fee",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -640,7 +640,7 @@
                 event-type: "VAULT-DEPOSIT",
                 actor: tx-sender,
                 payload: "Funds deposited into internal vault",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -672,7 +672,7 @@
                 event-type: "VAULT-WITHDRAW",
                 actor: tx-sender,
                 payload: "Funds withdrawn from internal vault",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -711,7 +711,7 @@
                 event-type: "MERCHANT-WITHDRAWAL",
                 actor: tx-sender,
                 payload: "Merchant revenue settlement completed",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -739,7 +739,7 @@
                 event-type: "STAKE-RECLAIM",
                 actor: tx-sender,
                 payload: "Verification stake returned to merchant",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -772,11 +772,14 @@
                 event-type: "FEE-SETTLEMENT",
                 actor: tx-sender,
                 payload: "Platform fees moved to treasury",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
 
+        (ok true)
+    )
+)
 
 ;; @desc Get detailed global protocol performance metrics
 (define-read-only (get-global-metrics)
@@ -791,10 +794,6 @@
             contract-balance: stx-balance,
             operational-status: (if (var-get is-paused) "paused" "active")
         }
-    )
-)
-
-        (ok true)
     )
 )
 
@@ -832,7 +831,7 @@
             proposer: tx-sender,
             confirmations: u1, ;; Proposer confirms by default
             status: "pending",
-            expires-at: (+ stacks-block-height u144) ;; ~24h expiry
+            expires-at: (+ block-height u144) ;; ~24h expiry
         })
 
         (var-set request-nonce new-id)
@@ -843,7 +842,7 @@
                 event-type: "WITHDRAWAL-PROPOSED",
                 actor: tx-sender,
                 payload: "Multi-sig withdrawal request initiated",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce log-id)
         )
@@ -935,7 +934,7 @@
                     event-type: "TIER-UPDATE",
                     actor: tx-sender,
                     payload: (concat "Merchant upgraded to " new-tier),
-                    timestamp: stacks-block-height
+                    timestamp: block-height
                 })
                 (var-set event-nonce id)
             )
@@ -968,7 +967,7 @@
                 event-type: "ADDRESS-BLACKLISTED",
                 actor: tx-sender,
                 payload: "Principal restricted from protocol access",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -991,7 +990,7 @@
                 event-type: "ADDRESS-UNBLACKLISTED",
                 actor: tx-sender,
                 payload: "Principal restriction removed",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -1013,7 +1012,7 @@
                 event-type: "ADDRESS-WHITELISTED",
                 actor: tx-sender,
                 payload: "Principal added to trusted whitelist",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -1050,7 +1049,7 @@
                 event-type: "BULK-PAYMENT",
                 actor: tx-sender,
                 payload: (concat "Batch payment processed for " (int-to-ascii batch-size)),
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -1072,7 +1071,7 @@
                 event-type: "BULK-UNBLACKLIST",
                 actor: tx-sender,
                 payload: "Batch restriction removal executed",
-                timestamp: stacks-block-height
+                timestamp: block-height
             })
             (var-set event-nonce id)
         )
@@ -1083,7 +1082,7 @@
 
 ;; --- Advanced Metrics & Statistics ---
 
-;; Tracks total volume per day (Day = stacks-block-height / 144)
+;; Tracks total volume per day (Day = block-height / 144)
 (define-map DailyVolume
     { day: uint }
     {
@@ -1109,7 +1108,7 @@
 ;; @param amount uint - The amount to record
 (define-private (update-volume-metrics (amount uint))
     (let (
-        (current-day (/ stacks-block-height u144))
+        (current-day (/ block-height u144))
         (current-stats (default-to { total-stx: u0, tx-count: u0, unique-senders: u0 } (map-get? DailyVolume { day: current-day })))
     )
         (map-set DailyVolume { day: current-day } {
@@ -1134,7 +1133,7 @@
     )
         (map-set ProtocolMilestones { milestone-id: new-id } {
             description: desc,
-            achieved-at: stacks-block-height,
+            achieved-at: block-height,
             volume-at-milestone: (var-get total-volume)
         })
         (var-set milestone-nonce new-id)
@@ -1142,7 +1141,7 @@
 )
 
 ;; @desc Query volume statistics for a specific day
-;; @param day uint - The day index (stacks-block-height / 144)
+;; @param day uint - The day index (block-height / 144)
 (define-read-only (get-daily-stats (day uint))
     (map-get? DailyVolume { day: day })
 )
