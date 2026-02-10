@@ -34,4 +34,11 @@ describe("S-pay Protocol: User Registration", () => {
     const json = cvToJSON(result) as any;
     expect(json.success).toBe(false);
   });
+
+  it("validates username length constraints", () => {
+    const longUsername = "a".repeat(25); // Max is 24
+    const { result } = simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii(longUsername)], accounts.get("wallet_4")!);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(false);
+  });
 });
