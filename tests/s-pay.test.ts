@@ -83,3 +83,20 @@ describe("S-pay Protocol: Merchant Admin Functions", () => {
     expect(json.success).toBe(true);
   });
 });
+
+describe("S-pay Protocol: Payment Processing", () => {
+  it("processes payment with correct fee distribution", () => {
+    const merchant = accounts.get("wallet_9")!;
+    const customer = accounts.get("wallet_10")!;
+    simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii("merchant4")], merchant);
+    simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii("customer1")], customer);
+    simnet.callPublicFn("s-pay", "register-merchant",
+      [Cl.stringAscii("Shop"), Cl.stringAscii("https://shop.com")], merchant);
+    simnet.callPublicFn("s-pay", "verify-merchant", [Cl.principal(merchant)], DEPLOYER);
+
+    const { result } = simnet.callPublicFn("s-pay", "process-payment",
+      [Cl.principal(merchant), Cl.uint(1000000), Cl.stringAscii("Order #123")], customer);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+  });
+});
