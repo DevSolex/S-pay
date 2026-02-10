@@ -779,10 +779,6 @@
             (var-set event-nonce id)
         )
 
-        (print { event: "fees-settled", amount: amount, treasury: (var-get fee-receiver) })
-        (ok true)
-    )
-)
 
 ;; @desc Get detailed global protocol performance metrics
 (define-read-only (get-global-metrics)
@@ -797,6 +793,157 @@
             contract-balance: stx-balance,
             operational-status: (if (var-get is-paused) "paused" "active")
         }
+    )
+)
+
+        (ok true)
+    )
+)
+
+;; --- Multi-Signature Withdrawal Controls ---
+
+(define-map WithdrawalRequests
+    { request-id: uint }
+    {
+        recipient: principal,
+        amount: uint,
+        proposer: principal,
+        confirmations: uint,
+        status: (string-ascii 12), ;; "pending", "executed", "cancelled"
+        expires-at: uint
+    }
+)
+
+(define-data-var request-nonce uint u0)
+(define-data-var required-confirmations uint u2)
+
+;; @desc Propose a large withdrawal requiring multiple signatures
+;; @param amount uint - Micro-STX to withdraw from contract
+;; @param recipient principal - Destination for the funds
+(define-public (propose-withdrawal (amount uint) (recipient principal))
+    (let (
+        (new-id (+ (var-get request-nonce) u1))
+    )
+        ;; Only owner can propose
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-OWNER)
+        (asserts! (> amount u0) ERR-INVALID-AMOUNT)
+
+        (map-set WithdrawalRequests { request-id: new-id } {
+            recipient: recipient,
+            amount: amount,
+            proposer: tx-sender,
+            confirmations: u1, ;; Proposer confirms by default
+            status: "pending",
+            expires-at: (+ stacks-block-height u144) ;; ~24h expiry
+        })
+
+        (var-set request-nonce new-id)
+
+        ;; Log the proposal
+        (let ((log-id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: log-id } {
+                event-type: "WITHDRAWAL-PROPOSED",
+                actor: tx-sender,
+                payload: "Multi-sig withdrawal request initiated",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce log-id)
+        )
+
+        (print { event: "withdrawal-proposed", id: new-id, amount: amount })
+        (ok new-id)
+    )
+)
+
+;; @desc Cancel a pending withdrawal request
+;; @param id uint - The request id
+(define-public (cancel-withdrawal (id uint))
+    (let (
+        (request (unwrap! (map-get? WithdrawalRequests { request-id: id }) ERR-NOT-ALLOWED))
+    )
+        (asserts! (is-eq tx-sender (get proposer request)) ERR-UNAUTHORIZED)
+        (asserts! (is-eq (get status request) "pending") ERR-INVALID-STATUS)
+
+        (map-set WithdrawalRequests { request-id: id } (merge request { status: "cancelled" }))
+        
+        (ok true)
+    )
+)
+
+        (ok true)
+    )
+)
+
+;; --- Dynamic Fee Tiers ---
+
+;; @desc Calculate the specific fee for a merchant based on their revenue tier
+;; @param merchant principal - The merchant address
+;; @param amount uint - The micro-STX value of the payment
+(define-private (calculate-merchant-fee (merchant principal) (amount uint))
+    (let (
+        (profile (default-to 
+            { total-revenue: u0, tier: "basic" } 
+            (map-get? Merchants merchant)
+        ))
+        (revenue (get total-revenue profile))
+        ;; Base fee from global setting
+        (base-fee-bps (var-get fee-percentage))
+    )
+        ;; Tiered discount logic
+        (if (> revenue u1000000000) ;; > 1000 STX: 25% discount on fee
+            (/ (* amount (- base-fee-bps (/ base-fee-bps u4))) BP-PERCENT)
+            (if (> revenue u5000000000) ;; > 5000 STX: 50% discount on fee
+                (/ (* amount (/ base-fee-bps u2)) BP-PERCENT)
+                (/ (* amount base-fee-bps) BP-PERCENT)
+            )
+        )
+    )
+)
+
+;; @desc Get the effective fee rate for a merchant
+;; @param merchant principal - The merchant address
+(define-read-only (get-effective-fee-rate (merchant principal))
+    (let (
+        (profile (default-to 
+            { total-revenue: u0, tier: "basic" } 
+            (map-get? Merchants merchant)
+        ))
+        (revenue (get total-revenue profile))
+        (base-rate (var-get fee-percentage))
+    )
+        (if (> revenue u5000000000)
+            (/ base-rate u2)
+            (if (> revenue u1000000000)
+                (- base-rate (/ base-rate u4))
+                base-rate
+            )
+        )
+    )
+)
+
+;; @desc Admin function to manually set a merchant tier (Admin Only)
+;; @param merchant principal - The merchant to upgrade
+;; @param new-tier (string-ascii 12) - "basic", "premium", "enterprise"
+(define-public (set-merchant-tier (merchant principal) (new-tier (string-ascii 12)))
+    (let (
+        (profile (unwrap! (map-get? Merchants merchant) ERR-MERCHANT-NOT-FOUND))
+    )
+        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-OWNER)
+        
+        (map-set Merchants merchant (merge profile { tier: new-tier }))
+        
+        ;; Log the tier update
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "TIER-UPDATE",
+                actor: tx-sender,
+                payload: (concat "Merchant upgraded to " new-tier),
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+        
+        (ok true)
     )
 )
 
