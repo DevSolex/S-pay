@@ -239,46 +239,48 @@
         (user (unwrap! (map-get? Users tx-sender) ERR-USER-NOT-FOUND))
         (new-id (+ (var-get merchant-nonce) u1))
     )
-        ;; Check if contract is paused
-        (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
+        (begin
+            ;; Check if contract is paused
+            (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
 
-        ;; Check if already a merchant
-        (asserts! (is-none (map-get? Merchants tx-sender)) ERR-ALREADY-REGISTERED)
+            ;; Check if already a merchant
+            (asserts! (is-none (map-get? Merchants tx-sender)) ERR-ALREADY-REGISTERED)
 
-        ;; Basic verification stake if required
-        (if (var-get require-merchant-verification)
-            (try! (stx-transfer? MERCHANT-VERIFICATION-STAKE tx-sender (as-contract tx-sender)))
-            true
+            ;; Basic verification stake if required
+            (if (var-get require-merchant-verification)
+                (try! (stx-transfer? MERCHANT-VERIFICATION-STAKE tx-sender (as-contract tx-sender)))
+                true
+            )
+
+            ;; Store merchant profile
+            (map-set Merchants tx-sender {
+                merchant-id: new-id,
+                business-name: business-name,
+                description: "",
+                website: website,
+                status: (if (var-get require-merchant-verification) "pending" "verified"),
+                tier: "basic",
+                total-revenue: u0,
+                dispute-count: u0,
+                metadata-hash: 0x0000000000000000000000000000000000000000000000000000000000000000
+            })
+
+            ;; Update user record to reflect merchant status
+            (map-set Users tx-sender (merge user { is-merchant: true }))
+
+            ;; Increment merchant nonce
+            (var-set merchant-nonce new-id)
+
+            ;; Emit merchant registration event
+            (print {
+                event: "merchant-registered",
+                merchant: tx-sender,
+                merchant-id: new-id,
+                business-name: business-name
+            })
+
+            (ok new-id)
         )
-
-        ;; Store merchant profile
-        (map-set Merchants tx-sender {
-            merchant-id: new-id,
-            business-name: business-name,
-            description: "",
-            website: website,
-            status: (if (var-get require-merchant-verification) "pending" "verified"),
-            tier: "basic",
-            total-revenue: u0,
-            dispute-count: u0,
-            metadata-hash: 0x0000000000000000000000000000000000000000000000000000000000000000
-        })
-
-        ;; Update user record to reflect merchant status
-        (map-set Users tx-sender (merge user { is-merchant: true }))
-
-        ;; Increment merchant nonce
-        (var-set merchant-nonce new-id)
-
-        ;; Emit merchant registration event
-        (print {
-            event: "merchant-registered",
-            merchant: tx-sender,
-            merchant-id: new-id,
-            business-name: business-name
-        })
-
-        (ok new-id)
     )
 )
 
@@ -746,10 +748,6 @@
     )
 )
 
-        (ok true)
-    )
-)
-
 ;; --- Fee and Metrics Management ---
 
 ;; @desc Settle accumulated fees to the treasury (Admin Only)
@@ -861,16 +859,14 @@
     (let (
         (request (unwrap! (map-get? WithdrawalRequests { request-id: id }) ERR-NOT-ALLOWED))
     )
-        (asserts! (is-eq tx-sender (get proposer request)) ERR-UNAUTHORIZED)
-        (asserts! (is-eq (get status request) "pending") ERR-INVALID-STATUS)
+        (begin
+            (asserts! (is-eq tx-sender (get proposer request)) ERR-UNAUTHORIZED)
+            (asserts! (is-eq (get status request) "pending") ERR-INVALID-STATUS)
 
-        (map-set WithdrawalRequests { request-id: id } (merge request { status: "cancelled" }))
-        
-        (ok true)
-    )
-)
-
-        (ok true)
+            (map-set WithdrawalRequests { request-id: id } (merge request { status: "cancelled" }))
+            
+            (ok true)
+        )
     )
 )
 
@@ -928,26 +924,24 @@
     (let (
         (profile (unwrap! (map-get? Merchants merchant) ERR-MERCHANT-NOT-FOUND))
     )
-        (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-OWNER)
-        
-        (map-set Merchants merchant (merge profile { tier: new-tier }))
-        
-        ;; Log the tier update
-        (let ((id (+ (var-get event-nonce) u1)))
-            (map-set SystemEvents { event-id: id } {
-                event-type: "TIER-UPDATE",
-                actor: tx-sender,
-                payload: (concat "Merchant upgraded to " new-tier),
-                timestamp: stacks-block-height
-            })
-            (var-set event-nonce id)
+        (begin
+            (asserts! (is-eq tx-sender (var-get contract-owner)) ERR-NOT-OWNER)
+            
+            (map-set Merchants merchant (merge profile { tier: new-tier }))
+            
+            ;; Log the tier update
+            (let ((id (+ (var-get event-nonce) u1)))
+                (map-set SystemEvents { event-id: id } {
+                    event-type: "TIER-UPDATE",
+                    actor: tx-sender,
+                    payload: (concat "Merchant upgraded to " new-tier),
+                    timestamp: stacks-block-height
+                })
+                (var-set event-nonce id)
+            )
+            
+            (ok true)
         )
-        
-        (ok true)
-    )
-)
-
-        (ok true)
     )
 )
 
@@ -1028,10 +1022,6 @@
     )
 )
 
-        (ok true)
-    )
-)
-
 ;; --- Bulk Transfer Utility ---
 
 ;; Helper structure for batch processing
@@ -1087,10 +1077,6 @@
             (var-set event-nonce id)
         )
         
-        (ok (map unblacklist-address accounts))
-    )
-)
-
         (ok (map unblacklist-address accounts))
     )
 )
