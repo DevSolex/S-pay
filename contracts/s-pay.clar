@@ -259,8 +259,56 @@
     )
 )
 
-;; read only functions
-;;
+;; User Profile Metadata - stores extended profile information and preferences
+(define-map UserProfiles
+    principal
+    {
+        bio: (string-ascii 160),
+        website: (string-ascii 128),
+        avatar-url: (string-ascii 256),
+        notification-enabled: bool,
+        preferred-currency: (string-ascii 3) ;; e.g., "STX", "USD"
+    }
+)
+
+;; --- Public Functions ---
+
+;; @desc Update extended user profile metadata
+;; @param bio (string-ascii 160) - Short user biography
+;; @param website (string-ascii 128) - Personal website/social link
+;; @param avatar-url (string-ascii 256) - Link to user profile picture
+(define-public (update-user-profile 
+    (bio (string-ascii 160)) 
+    (website (string-ascii 128)) 
+    (avatar-url (string-ascii 256))
+    (notifications bool)
+    (currency (string-ascii 3))
+)
+    (let (
+        (user (unwrap! (map-get? Users tx-sender) ERR-USER-NOT-FOUND))
+    )
+        ;; Check if contract is paused
+        (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
+
+        ;; Store or update profile
+        (map-set UserProfiles tx-sender {
+            bio: bio,
+            website: website,
+            avatar-url: avatar-url,
+            notification-enabled: notifications,
+            preferred-currency: currency
+        })
+
+        ;; Emit profile update event
+        (print {
+            event: "profile-updated",
+            user: tx-sender,
+            updated-at: stacks-block-height
+        })
+
+        (ok true)
+    )
+)
 
 ;; private functions
 ;;
