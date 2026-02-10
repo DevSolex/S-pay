@@ -553,3 +553,81 @@
     )
 )
 
+;; --- Asset Management Logic ---
+
+;; @desc Core STX transfer with platform fee deduction
+;; @param amount uint - Total micro-STX to be sent (including fee)
+;; @param recipient principal - The destination address
+(define-public (process-payment (amount uint) (recipient principal))
+    (let (
+        (fee (calculate-fee amount))
+        (net-amount (- amount fee))
+    )
+        ;; Basic validation
+        (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
+        (asserts! (>= amount MIN-PAYMENT-STX) ERR-INVALID-AMOUNT)
+        
+        ;; Check max payment limit if set
+        (match (var-get max-payment-amount)
+            limit (asserts! (<= amount limit) ERR-LIMIT-EXCEEDED)
+            true
+        )
+
+        ;; Perform transfer to recipient
+        (try! (stx-transfer? net-amount tx-sender recipient))
+        
+        ;; Perform transfer to fee receiver (if fee > 0)
+        (if (> fee u0)
+            (try! (stx-transfer? fee tx-sender (var-get fee-receiver)))
+            true
+        )
+
+        ;; Update global tracking
+        (var-set total-volume (+ (var-get total-volume) amount))
+        (var-set total-fees-collected (+ (var-get total-fees-collected) fee))
+
+        ;; Log the payment event
+        (let ((id (+ (var-get event-nonce) u1)))
+            (map-set SystemEvents { event-id: id } {
+                event-type: "PAYMENT-PROCESSED",
+                actor: tx-sender,
+                payload: "STX payment settled with platform fee",
+                timestamp: stacks-block-height
+            })
+            (var-set event-nonce id)
+        )
+
+        ;; Emit payment event
+        (print {
+            event: "payment-processed",
+            sender: tx-sender,
+            recipient: recipient,
+            gross: amount,
+            fee: fee,
+            net: net-amount
+        })
+
+        (ok true)
+    )
+)
+
+;; --- Private Functions ---
+
+;; @desc Calculate the platform fee based on the amount
+;; @param amount uint - The micro-STX value
+(define-private (calculate-fee (amount uint))
+    (let (
+        (fee (/ (* amount (var-get fee-percentage)) BP-PERCENT))
+    )
+        (if (> fee MAX-FEE-PERCENT) ;; Safety ceiling check
+            fee
+            fee
+        )
+    )
+)
+
+;; @desc Simple permission check helper
+(define-private (is-owner)
+    (is-eq tx-sender (var-get contract-owner))
+)
+
