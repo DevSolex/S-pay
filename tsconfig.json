@@ -1,26 +1,32 @@
-
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
+    "target": "ES2020",
     "module": "ESNext",
-    "lib": ["ESNext"],
-    "skipLibCheck": true,
-
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-
+    "lib": [
+      "ES2020"
+    ],
+    "moduleResolution": "node",
     "strict": true,
-    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "node_modules/@stacks/clarinet-sdk/vitest-helpers/src",
-    "tests"
+    "scripts/**/*",
+    "tests/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }
