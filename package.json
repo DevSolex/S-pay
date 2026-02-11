@@ -7,7 +7,22 @@
   "scripts": {
     "test": "vitest run",
     "test:report": "vitest run -- --coverage --costs",
-    "test:watch": "chokidar \"tests/**/*.ts\" \"contracts/**/*.clar\" -c \"npm run test:report\""
+    "test:watch": "chokidar \"tests/**/*.ts\" \"contracts/**/*.clar\" -c \"npm run test:report\"",
+    "lint": "eslint scripts/**/*.js tests/**/*.ts",
+    "lint:fix": "eslint scripts/**/*.js tests/**/*.ts --fix",
+    "format": "prettier --write \"**/*.{js,ts,json}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,json}\"",
+    "deploy": "node deploy.js",
+    "check": "clarinet check",
+    "balance": "node scripts/balance-checker.js",
+    "merchant:stats": "node scripts/merchant-stats.js",
+    "user:lookup": "node scripts/user-lookup.js",
+    "payment:history": "node scripts/payment-history.js",
+    "vault:summary": "node scripts/vault-summary.js",
+    "token:distribute": "node scripts/token-distribution.js",
+    "metrics": "node scripts/metrics-dashboard.js",
+    "backup": "node scripts/backup.js",
+    "migrate": "node scripts/migration-helper.js"
   },
   "author": "",
   "license": "ISC",
