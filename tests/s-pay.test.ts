@@ -41,6 +41,19 @@ describe("S-pay Protocol: User Registration", () => {
     const json = cvToJSON(result) as any;
     expect(json.success).toBe(false);
   });
+
+  it("rejects empty username registration", () => {
+    const { result } = simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii("")], accounts.get("wallet_16")!);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(false);
+  });
+
+  it("handles username with special characters", () => {
+    const username = "user_123";
+    const { result } = simnet.callPublicFn("s-pay", "register-user", [Cl.stringAscii(username)], accounts.get("wallet_17")!);
+    const json = cvToJSON(result) as any;
+    expect(json.success).toBe(true);
+  });
 });
 
 describe("S-pay Protocol: Merchant Registration", () => {
