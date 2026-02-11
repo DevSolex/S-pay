@@ -1,0 +1,26 @@
+version: "2.1"
+
+services:
+  s-pay-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - STACKS_NETWORK=mainnet
+    env_file:
+      - .env
+    volumes:
+      - ./backups:/app/backups
+    restart: unless-stopped
+    
+  s-pay-monitor:
+    build: .
+    command: node scripts/health-check.js
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - s-pay-app
