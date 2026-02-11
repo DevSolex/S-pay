@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.cache/
+backups/
+*.log
+.env
+.DS_Store
+coverage/
+*.info
+costs-reports.json
+report-*.json
+migration-plan.json
