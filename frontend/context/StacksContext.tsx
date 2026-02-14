@@ -5,12 +5,21 @@ import { AppConfig, UserSession, showConnect } from '@stacks/connect';
 import stacksNetwork from '@stacks/network';
 const { STACKS_MAINNET } = stacksNetwork;
 
+export interface StacksUserData {
+  profile: {
+    stxAddress: {
+      mainnet: string;
+      testnet: string;
+    };
+  };
+}
+
 interface StacksContextType {
   userSession: UserSession;
-  userData: any;
+  userData: StacksUserData | null;
   handleConnect: () => void;
   handleDisconnect: () => void;
-  network: StacksMainnet;
+  network: any;
 }
 
 const StacksContext = createContext<StacksContextType | undefined>(undefined);

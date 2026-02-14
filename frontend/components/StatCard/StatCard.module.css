@@ -30,6 +30,9 @@
 
 .trend {
   font-size: 0.8rem;
-  color: var(--success);
   margin-top: 0.5rem;
+  font-weight: 600;
 }
+
+.up { color: var(--success); }
+.down { color: var(--error); }

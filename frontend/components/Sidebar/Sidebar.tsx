@@ -37,6 +37,7 @@ export default function Sidebar() {
             key={item.href} 
             href={item.href}
             className={`${styles.navItem} ${pathname === item.href ? styles.active : ""}`}
+            aria-current={pathname === item.href ? "page" : undefined}
           >
             <item.icon size={20} />
             <span>{item.name}</span>
