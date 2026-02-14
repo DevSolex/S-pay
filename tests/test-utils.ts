@@ -26,12 +26,12 @@ export function processTestPayment(simnet, merchant, customer, amount, memo) {
 }
 
 export function mintTestTokens(simnet, recipient, amount, deployer) {
-    return simnet.callPublicFn("s-pay-token", "mint",
+    return simnet.callPublicFn("ltc", "mint",
         [Cl.uint(amount), Cl.principal(recipient)], deployer);
 }
 
 export function transferTestTokens(simnet, sender, recipient, amount) {
-    return simnet.callPublicFn("s-pay-token", "transfer",
+    return simnet.callPublicFn("ltc", "transfer",
         [Cl.uint(amount), Cl.principal(sender), Cl.principal(recipient), Cl.none()], sender);
 }
 

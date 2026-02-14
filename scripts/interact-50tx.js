@@ -43,7 +43,7 @@ async function getNextNonce(addr) {
     }
 }
 
-async function callContractFunction(functionName, functionArgs, nonce, fee = 50000n) {
+async function callContractFunction(functionName, functionArgs, nonce, fee = 20000n) {
     console.log(`[${nonce}] Calling ${functionName}...`);
     
     try {
@@ -88,7 +88,7 @@ async function run50Transactions() {
     // Transaction 1-5: Vault deposits with varying amounts
     for (let i = 0; i < 5; i++) {
         const amount = uintCV(1000000 + (i * 100000)); // 1-1.4 STX
-        const txid = await callContractFunction('vault-deposit', [amount], currentNonce, 50000n);
+        const txid = await callContractFunction('vault-deposit', [amount], currentNonce, 20000n);
         if (txid) {
             successCount++;
             currentNonce++;
@@ -100,7 +100,7 @@ async function run50Transactions() {
     // Transaction 6-10: Get protocol status (read-only, but we'll call as tx for volume)
     for (let i = 0; i < 5; i++) {
         const amount = uintCV(500000); // 0.5 STX
-        const txid = await callContractFunction('vault-deposit', [amount], currentNonce, 50000n);
+        const txid = await callContractFunction('vault-deposit', [amount], currentNonce, 20000n);
         if (txid) {
             successCount++;
             currentNonce++;
@@ -112,7 +112,7 @@ async function run50Transactions() {
     // Transaction 11-15: Vault withdrawals
     for (let i = 0; i < 5; i++) {
         const amount = uintCV(300000); // 0.3 STX
-        const txid = await callContractFunction('vault-withdraw', [amount], currentNonce, 50000n);
+        const txid = await callContractFunction('vault-withdraw', [amount], currentNonce, 20000n);
         if (txid) {
             successCount++;
             currentNonce++;
@@ -133,7 +133,7 @@ async function run50Transactions() {
     for (let i = 0; i < 10; i++) {
         const amount = uintCV(2000000 + (i * 50000)); // 2-2.45 STX
         const recipient = standardPrincipalCV(recipients[i % recipients.length]);
-        const txid = await callContractFunction('process-payment', [amount, recipient], currentNonce, 60000n);
+        const txid = await callContractFunction('process-payment', [amount, recipient], currentNonce, 20000n);
         if (txid) {
             successCount++;
             currentNonce++;
@@ -145,7 +145,7 @@ async function run50Transactions() {
     // Transaction 26-30: More vault deposits
     for (let i = 0; i < 5; i++) {
         const amount = uintCV(800000 + (i * 50000)); // 0.8-1 STX
-        const txid = await callContractFunction('vault-deposit', [amount], currentNonce, 50000n);
+        const txid = await callContractFunction('vault-deposit', [amount], currentNonce, 20000n);
         if (txid) {
             successCount++;
             currentNonce++;
@@ -166,7 +166,7 @@ async function run50Transactions() {
             'update-user-profile',
             [bio, website, avatar, notifications, currency],
             currentNonce,
-            50000n
+            20000n
         );
         if (txid) {
             successCount++;
@@ -180,7 +180,7 @@ async function run50Transactions() {
     for (let i = 0; i < 5; i++) {
         const amount = uintCV(1500000 + (i * 100000)); // 1.5-1.9 STX
         const recipient = standardPrincipalCV(recipients[i % recipients.length]);
-        const txid = await callContractFunction('process-payment', [amount, recipient], currentNonce, 60000n);
+        const txid = await callContractFunction('process-payment', [amount, recipient], currentNonce, 20000n);
         if (txid) {
             successCount++;
             currentNonce++;
@@ -195,7 +195,7 @@ async function run50Transactions() {
         const amount = uintCV(400000 + (i * 50000)); // 0.4-0.6 STX
         const functionName = isDeposit ? 'vault-deposit' : 'vault-withdraw';
         
-        const txid = await callContractFunction(functionName, [amount], currentNonce, 50000n);
+        const txid = await callContractFunction(functionName, [amount], currentNonce, 20000n);
         if (txid) {
             successCount++;
             currentNonce++;
@@ -208,7 +208,7 @@ async function run50Transactions() {
     for (let i = 0; i < 5; i++) {
         const amount = uintCV(3000000 + (i * 100000)); // 3-3.4 STX
         const recipient = standardPrincipalCV(recipients[i % recipients.length]);
-        const txid = await callContractFunction('process-payment', [amount, recipient], currentNonce, 60000n);
+        const txid = await callContractFunction('process-payment', [amount, recipient], currentNonce, 20000n);
         if (txid) {
             successCount++;
             currentNonce++;
