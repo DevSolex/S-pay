@@ -1,0 +1,38 @@
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  padding: 1rem;
+  color: #71717a;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.table td {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.95rem;
+}
+
+.type { font-weight: 600; }
+.amount { font-family: monospace; }
+
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.confirmed { background: rgba(0, 230, 118, 0.1); color: var(--success); }
+.pending { background: rgba(255, 183, 77, 0.1); color: var(--warning); }

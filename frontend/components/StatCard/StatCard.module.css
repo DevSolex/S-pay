@@ -1,0 +1,35 @@
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem !important;
+}
+
+.iconWrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: var(--primary-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.label {
+  font-size: 0.9rem;
+  color: #a0a0aa;
+  margin-bottom: 0.25rem;
+}
+
+.value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.trend {
+  font-size: 0.8rem;
+  color: var(--success);
+  margin-top: 0.5rem;
+}
