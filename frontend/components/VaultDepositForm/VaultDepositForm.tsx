@@ -11,7 +11,8 @@ export function VaultDepositForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const amount = BigInt(Math.floor(parseFloat(amountStx || "0") * 1e6));
-    if (amount > BigInt(0)) vaultDeposit(amount);
+    if (amount <= BigInt(0)) return;
+    vaultDeposit(amount);
   };
 
   return (
@@ -19,10 +20,12 @@ export function VaultDepositForm() {
       <input
         type="number"
         step="0.000001"
+        min="0"
         value={amountStx}
         onChange={(e) => setAmountStx(e.target.value)}
         placeholder="Amount (STX)"
         className={styles.input}
+        aria-label="Amount in STX"
       />
       <button type="submit" className={styles.btn}>
         Deposit to Vault
