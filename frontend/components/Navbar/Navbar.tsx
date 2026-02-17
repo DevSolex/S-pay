@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useStacks } from "@/context/StacksContext";
 import { useCopyAddress } from "@/hooks/useCopyAddress";
 import { shortenAddress } from "@/lib/utils";
+import { NetworkBadge } from "@/components/NetworkBadge/NetworkBadge";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
@@ -26,6 +27,7 @@ export default function Navbar() {
           <Link href="/docs" className={styles.link}>Developers</Link>
         </div>
         <div className={styles.actions}>
+          <NetworkBadge />
           {addr ? (
             <>
               <button
