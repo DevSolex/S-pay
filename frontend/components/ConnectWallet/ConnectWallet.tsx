@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useStacks } from "@/context/StacksContext";
+import { shortenAddress } from "@/lib/utils";
 import styles from "./ConnectWallet.module.css";
 
 export function ConnectWallet() {
@@ -21,7 +22,7 @@ export function ConnectWallet() {
     <div className={styles.actions}>
       {address ? (
         <>
-          <span className={styles.address}>{address.slice(0, 6)}…{address.slice(-4)}</span>
+          <span className={styles.address}>{shortenAddress(address)}</span>
           <button className={styles.secondaryBtn} onClick={handleDisconnect}>
             Disconnect
           </button>
