@@ -1,6 +1,7 @@
 "use client";
 
 import { PaymentForm } from "@/components/PaymentForm/PaymentForm";
+import { SPAY_FULL_CONTRACT } from "@/lib/constants";
 import styles from "./pay.module.css";
 
 export default function PayPage() {
@@ -10,6 +11,7 @@ export default function PayPage() {
       <p className={styles.subtitle}>
         Send STX via S-pay protocol (process-payment)
       </p>
+      <p className={styles.contract}>Contract: {SPAY_FULL_CONTRACT}</p>
       <PaymentForm />
     </div>
   );
