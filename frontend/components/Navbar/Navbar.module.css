@@ -83,3 +83,11 @@
   border-color: var(--primary);
   box-shadow: 0 0 15px var(--primary-glow);
 }
+
+@media (max-width: 900px) {
+  .links { gap: 1.5rem; }
+}
+
+@media (max-width: 700px) {
+  .links { display: none; }
+}
