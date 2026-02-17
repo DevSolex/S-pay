@@ -13,7 +13,7 @@ export function Footer() {
           GitHub
         </a>
       </div>
-      <p className={styles.copyright}>© {new Date().getFullYear()} S-pay</p>
+      <p className={styles.copyright}>© {new Date().getFullYear()} S-pay · Stacks Mainnet</p>
     </footer>
   );
 }
