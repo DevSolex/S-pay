@@ -1,7 +1,7 @@
 /**
- * Read-only contract calls using @stacks/transactions for encoding.
+ * Read-only contract calls using @stacks/transactions for encoding/decoding.
  */
-import { cvToHex, deserializeCV } from "@stacks/transactions";
+import { cvToHex, deserializeCV, cvToValue } from "@stacks/transactions";
 import type { ClarityValue } from "@stacks/transactions";
 import { SPAY_CONTRACT } from "./constants";
 
@@ -25,5 +25,6 @@ export async function callReadOnly<T = ClarityValue>(
 }
 
 export async function getProtocolStatus(senderAddress: string) {
-  return callReadOnly("get-protocol-status", [], senderAddress);
+  const cv = await callReadOnly("get-protocol-status", [], senderAddress);
+  return cvToValue(cv);
 }
