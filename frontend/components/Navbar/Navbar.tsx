@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { useStacks } from "@/context/StacksContext";
+import { useCopyAddress } from "@/hooks/useCopyAddress";
+import { shortenAddress } from "@/lib/utils";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
   const { address: addr, handleConnect, handleDisconnect } = useStacks();
+  const { copy, copied } = useCopyAddress();
 
   return (
     <nav className={styles.navbar}>
@@ -25,7 +28,13 @@ export default function Navbar() {
         <div className={styles.actions}>
           {addr ? (
             <>
-              <span className={styles.address}>{addr.slice(0, 6)}…{addr.slice(-4)}</span>
+              <button
+                className={styles.address}
+                onClick={() => copy(addr)}
+                title={addr}
+              >
+                {shortenAddress(addr)}{copied ? " ✓" : ""}
+              </button>
               <button className={styles.connectBtn} onClick={handleDisconnect}>Disconnect</button>
             </>
           ) : (
