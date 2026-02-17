@@ -1,10 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import { useStacks } from "@/context/StacksContext";
 import styles from "./ConnectWallet.module.css";
 
 export function ConnectWallet() {
   const { address, handleConnect, handleDisconnect } = useStacks();
+  const [connecting, setConnecting] = useState(false);
+
+  const onConnect = async () => {
+    setConnecting(true);
+    try {
+      await handleConnect();
+    } finally {
+      setConnecting(false);
+    }
+  };
 
   return (
     <div className={styles.actions}>
@@ -17,8 +28,8 @@ export function ConnectWallet() {
         </>
       ) : (
         <>
-          <button className={styles.primaryBtn} onClick={handleConnect}>
-            Connect Wallet
+          <button className={styles.primaryBtn} onClick={onConnect} disabled={connecting}>
+            {connecting ? "Connecting…" : "Connect Wallet"}
           </button>
           <button className={styles.secondaryBtn}>Learn More</button>
         </>
