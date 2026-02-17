@@ -31,3 +31,15 @@ export function buildProcessPaymentOptions(amount: bigint | number, recipient: s
     functionArgs: [uintCV(amount), principalCV(recipient)],
   };
 }
+
+export function buildRegisterMerchantOptions(
+  businessName: string,
+  website: string
+) {
+  return {
+    contractAddress: SPAY_CONTRACT.address,
+    contractName: SPAY_CONTRACT.name,
+    functionName: "register-merchant",
+    functionArgs: [stringAsciiCV(businessName), stringAsciiCV(website)],
+  };
+}
