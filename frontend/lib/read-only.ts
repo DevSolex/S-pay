@@ -23,3 +23,7 @@ export async function callReadOnly<T = ClarityValue>(
   const data = await res.json();
   return deserializeCV(data.result) as T;
 }
+
+export async function getProtocolStatus(senderAddress: string) {
+  return callReadOnly("get-protocol-status", [], senderAddress);
+}
