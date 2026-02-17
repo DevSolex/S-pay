@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useStacks } from "@/context/StacksContext";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
+  const { userData, handleConnect, handleDisconnect } = useStacks();
+  const addr = userData?.profile?.stxAddress?.mainnet ?? userData?.profile?.stxAddress?.testnet;
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
@@ -16,7 +20,14 @@ export default function Navbar() {
           <Link href="/docs" className={styles.link}>Developers</Link>
         </div>
         <div className={styles.actions}>
-          <button className={styles.connectBtn}>Connect</button>
+          {addr ? (
+            <>
+              <span className={styles.address}>{addr.slice(0, 6)}…{addr.slice(-4)}</span>
+              <button className={styles.connectBtn} onClick={handleDisconnect}>Disconnect</button>
+            </>
+          ) : (
+            <button className={styles.connectBtn} onClick={handleConnect}>Connect</button>
+          )}
         </div>
       </div>
     </nav>
