@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { StacksProvider } from "@/context/StacksContext";
+import Navbar from "@/components/Navbar/Navbar";
 
 export const metadata: Metadata = {
   title: "S-pay | Premium Stacks Payments",
@@ -21,6 +22,7 @@ export default function RootLayout({
       </head>
       <body>
         <StacksProvider>
+          <Navbar />
           {children}
         </StacksProvider>
       </body>
