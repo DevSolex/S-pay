@@ -17,6 +17,8 @@ export default function Navbar() {
         <div className={styles.links}>
           <Link href="/register" className={styles.link}>Register</Link>
           <Link href="/pay" className={styles.link}>Pay</Link>
+          <Link href="/vault" className={styles.link}>Vault</Link>
+          <Link href="/merchant/register" className={styles.link}>Merchant</Link>
           <Link href="/payments" className={styles.link}>Payments</Link>
           <Link href="/tokens" className={styles.link}>Tokens</Link>
           <Link href="/docs" className={styles.link}>Developers</Link>
