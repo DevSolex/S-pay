@@ -1,4 +1,5 @@
 import styles from "./page.module.css";
+import { ConnectWallet } from "@/components/ConnectWallet/ConnectWallet";
 
 export default function Home() {
   return (
@@ -10,23 +11,11 @@ export default function Home() {
           <span>Powered by Stacks.</span>
         </h1>
         <p className={styles.description}>
-          Experience the most premium payment gateway for the Bitcoin ecosystem. 
+          Experience the most premium payment gateway for the Bitcoin ecosystem.
           Fast, decentralized, and built for modern commerce.
         </p>
-        <div className={styles.actions}>
-          <button className={styles.primaryBtn}>Connect Wallet</button>
-          <button className={styles.secondaryBtn}>Learn More</button>
-        </div>
+        <ConnectWallet />
       </header>
     </div>
   );
 }
-// Final polish 62
-// Final polish 63
-// Final polish 64
-// Final polish 65
-// Final polish 66
-// Final polish 67
-// Final polish 68
-// Final polish 69
-// Final polish 70
