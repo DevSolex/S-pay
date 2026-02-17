@@ -23,13 +23,22 @@ export function ConnectWallet() {
       {address ? (
         <>
           <span className={styles.address}>{shortenAddress(address)}</span>
-          <button className={styles.secondaryBtn} onClick={handleDisconnect}>
+          <button
+            className={styles.secondaryBtn}
+            onClick={handleDisconnect}
+            aria-label="Disconnect wallet"
+          >
             Disconnect
           </button>
         </>
       ) : (
         <>
-          <button className={styles.primaryBtn} onClick={onConnect} disabled={connecting}>
+          <button
+            className={styles.primaryBtn}
+            onClick={onConnect}
+            disabled={connecting}
+            aria-label="Connect wallet"
+          >
             {connecting ? "Connecting…" : "Connect Wallet"}
           </button>
           <button className={styles.secondaryBtn}>Learn More</button>
