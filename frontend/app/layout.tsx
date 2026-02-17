@@ -7,6 +7,8 @@ import { Footer } from "@/components/Footer/Footer";
 export const metadata: Metadata = {
   title: "S-pay | Premium Stacks Payments",
   description: "Experience the future of decentralized payments on Stacks.",
+  keywords: ["Stacks", "Bitcoin", "payments", "crypto", "decentralized"],
+  openGraph: { title: "S-pay | Premium Stacks Payments", description: "Fast, decentralized payments on Stacks." },
 };
 
 export default function RootLayout({
