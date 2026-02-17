@@ -1,0 +1,27 @@
+.footer {
+  margin-top: auto;
+  padding: 2rem;
+  text-align: center;
+  border-top: 1px solid var(--glass-border);
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.links a {
+  color: #a0a0aa;
+  text-decoration: none;
+}
+
+.links a:hover {
+  color: var(--foreground);
+}
+
+.copyright {
+  font-size: 0.85rem;
+  color: #6b6b7b;
+}
