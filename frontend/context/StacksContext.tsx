@@ -1,8 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { AppConfig, UserSession, showConnect } from '@stacks/connect';
-import { StacksMainnet } from '@stacks/network';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import {
+  AppConfig,
+  UserSession,
+  showConnect,
+  openContractCall,
+} from "@stacks/connect";
+import { StacksMainnet } from "@stacks/network";
 
 export interface StacksUserData {
   profile: {
@@ -13,12 +18,20 @@ export interface StacksUserData {
   };
 }
 
+export interface ContractCallBase {
+  contractAddress: string;
+  contractName: string;
+  functionName: string;
+  functionArgs: unknown[];
+}
+
 interface StacksContextType {
   userSession: UserSession;
   userData: StacksUserData | null;
   handleConnect: () => void;
   handleDisconnect: () => void;
-  network: any;
+  network: unknown;
+  callContract: (options: ContractCallBase) => void;
 }
 
 const StacksContext = createContext<StacksContextType | undefined>(undefined);
@@ -55,8 +68,27 @@ export function StacksProvider({ children }: { children: React.ReactNode }) {
     setUserData(null);
   };
 
+  const callContract = (options: ContractCallBase) => {
+    openContractCall({
+      ...options,
+      userSession,
+      network,
+      onFinish: () => {},
+      onCancel: () => {},
+    });
+  };
+
   return (
-    <StacksContext.Provider value={{ userSession, userData, handleConnect, handleDisconnect, network }}>
+    <StacksContext.Provider
+      value={{
+        userSession,
+        userData,
+        handleConnect,
+        handleDisconnect,
+        network,
+        callContract,
+      }}
+    >
       {children}
     </StacksContext.Provider>
   );
