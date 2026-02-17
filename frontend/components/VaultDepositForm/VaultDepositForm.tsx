@@ -11,7 +11,7 @@ export function VaultDepositForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const amount = BigInt(Math.floor(parseFloat(amountStx || "0") * 1e6));
-    if (amount > 0n) vaultDeposit(amount);
+    if (amount > BigInt(0)) vaultDeposit(amount);
   };
 
   return (

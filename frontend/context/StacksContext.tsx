@@ -10,15 +10,6 @@ import {
 } from "@stacks/connect";
 import { StacksMainnet } from "@stacks/network";
 
-export interface StacksUserData {
-  profile: {
-    stxAddress: {
-      mainnet: string;
-      testnet: string;
-    };
-  };
-}
-
 export interface ContractCallBase {
   contractAddress: string;
   contractName: string;
@@ -27,11 +18,9 @@ export interface ContractCallBase {
 }
 
 interface StacksContextType {
-  userSession: UserSession;
-  userData: StacksUserData | null;
+  address: string | null;
   handleConnect: () => void;
   handleDisconnect: () => void;
-  network: unknown;
   callContract: (options: ContractCallBase) => void;
   transferStx: (recipient: string, amountMicroStx: bigint) => void;
 }
@@ -39,40 +28,48 @@ interface StacksContextType {
 const StacksContext = createContext<StacksContextType | undefined>(undefined);
 
 export function StacksProvider({ children }: { children: React.ReactNode }) {
-  const [userData, setUserData] = useState<any>(null);
-  
-  const appConfig = new AppConfig(['store_write', 'publish_data']);
+  const [address, setAddress] = useState<string | null>(null);
+
+  const appConfig = new AppConfig(["store_write", "publish_data"]);
   const userSession = new UserSession({ appConfig });
   const network = new StacksMainnet();
 
   useEffect(() => {
     if (userSession.isUserSignedIn()) {
-      setUserData(userSession.loadUserData());
+      const data = userSession.loadUserData();
+      const addr =
+        data?.profile?.stxAddress?.mainnet ?? data?.profile?.stxAddress?.testnet;
+      setAddress(addr ?? null);
     }
   }, []);
 
   const handleConnect = () => {
     showConnect({
       appDetails: {
-        name: 'S-pay',
-        icon: window.location.origin + '/favicon.ico',
+        name: "S-pay",
+        icon: typeof window !== "undefined" ? window.location.origin + "/favicon.ico" : "",
       },
-      redirectTo: '/',
+      redirectTo: "/",
       onFinish: () => {
-        setUserData(userSession.loadUserData());
+        const data = userSession.loadUserData();
+        const addr =
+          data?.profile?.stxAddress?.mainnet ?? data?.profile?.stxAddress?.testnet;
+        setAddress(addr ?? null);
       },
+      onCancel: () => {},
       userSession,
     });
   };
 
   const handleDisconnect = () => {
     userSession.signUserOut();
-    setUserData(null);
+    setAddress(null);
   };
 
   const callContract = (options: ContractCallBase) => {
     openContractCall({
       ...options,
+      functionArgs: options.functionArgs as (string | import("@stacks/transactions").ClarityValue)[],
       userSession,
       network,
       onFinish: () => {},
@@ -94,11 +91,9 @@ export function StacksProvider({ children }: { children: React.ReactNode }) {
   return (
     <StacksContext.Provider
       value={{
-        userSession,
-        userData,
+        address,
         handleConnect,
         handleDisconnect,
-        network,
         callContract,
         transferStx,
       }}

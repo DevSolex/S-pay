@@ -5,8 +5,7 @@ import { useStacks } from "@/context/StacksContext";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
-  const { userData, handleConnect, handleDisconnect } = useStacks();
-  const addr = userData?.profile?.stxAddress?.mainnet ?? userData?.profile?.stxAddress?.testnet;
+  const { address: addr, handleConnect, handleDisconnect } = useStacks();
 
   return (
     <nav className={styles.navbar}>

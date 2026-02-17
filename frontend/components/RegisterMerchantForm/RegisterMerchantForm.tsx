@@ -9,8 +9,8 @@ export function RegisterMerchantForm() {
   const [businessName, setBusinessName] = useState("");
   const [website, setWebsite] = useState("");
   const { registerMerchant } = useRegisterMerchant();
-  const { userData } = useStacks();
-  const isConnected = !!userData;
+  const { address } = useStacks();
+  const isConnected = !!address;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -9,18 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.2.3",
-    "react": "^18",
-    "react-dom": "^18",
-    "@stacks/connect": "^8.2.4",
+    "@stacks/connect": "^7.10.1",
     "@stacks/network": "^6.5.5",
     "@stacks/transactions": "^6.10.0",
-    "lucide-react": "^0.378.0"
+    "lucide-react": "^0.378.0",
+    "next": "14.2.3",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
-    "@types/react-dom": "^18"
+    "@types/react-dom": "^18",
+    "typescript": "^5"
   }
 }

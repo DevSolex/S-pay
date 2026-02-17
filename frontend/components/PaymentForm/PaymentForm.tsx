@@ -12,7 +12,7 @@ export function PaymentForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const amount = BigInt(Math.floor(parseFloat(amountStx || "0") * 1e6));
-    if (recipient && amount > 0n) processPayment(amount, recipient);
+    if (recipient && amount > BigInt(0)) processPayment(amount, recipient);
   };
 
   return (

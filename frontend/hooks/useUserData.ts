@@ -6,12 +6,9 @@ import { useStacks } from "@/context/StacksContext";
 import { callReadOnly } from "@/lib/read-only";
 
 export function useUserData() {
-  const { userData } = useStacks();
+  const { address } = useStacks();
   const [data, setData] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
-
-  const address =
-    userData?.profile?.stxAddress?.mainnet ?? userData?.profile?.stxAddress?.testnet;
 
   const fetchUserData = useCallback(async () => {
     if (!address) return;

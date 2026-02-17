@@ -4,8 +4,7 @@ import { useStacks } from "@/context/StacksContext";
 import styles from "./ConnectWallet.module.css";
 
 export function ConnectWallet() {
-  const { userData, handleConnect, handleDisconnect } = useStacks();
-  const address = userData?.profile?.stxAddress?.mainnet ?? userData?.profile?.stxAddress?.testnet;
+  const { address, handleConnect, handleDisconnect } = useStacks();
 
   return (
     <div className={styles.actions}>

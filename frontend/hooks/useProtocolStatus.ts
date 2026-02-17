@@ -5,11 +5,8 @@ import { useStacks } from "@/context/StacksContext";
 import { getProtocolStatus } from "@/lib/read-only";
 
 export function useProtocolStatus() {
-  const { userData } = useStacks();
+  const { address } = useStacks();
   const [status, setStatus] = useState<unknown>(null);
-
-  const address =
-    userData?.profile?.stxAddress?.mainnet ?? userData?.profile?.stxAddress?.testnet;
 
   const fetchStatus = useCallback(async () => {
     const sender = address ?? "SP2DBFGMT7SATSJPCCA38SDDPBNNQ86QWADJ3E6WT";

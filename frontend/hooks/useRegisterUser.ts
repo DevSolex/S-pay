@@ -5,7 +5,7 @@ import { useStacks } from "@/context/StacksContext";
 import { buildRegisterUserOptions } from "@/lib/contract-calls";
 
 export function useRegisterUser() {
-  const { callContract, userData } = useStacks();
+  const { callContract, address } = useStacks();
 
   const registerUser = useCallback(
     (username: string) => {
@@ -15,5 +15,5 @@ export function useRegisterUser() {
     [callContract]
   );
 
-  return { registerUser, isConnected: !!userData };
+  return { registerUser, isConnected: !!address };
 }
