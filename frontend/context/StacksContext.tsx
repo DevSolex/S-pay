@@ -75,7 +75,7 @@ export function StacksProvider({ children }: { children: React.ReactNode }) {
       showConnect({
         appDetails: {
           name: "S-pay",
-          icon: typeof window !== "undefined" ? window.location.origin + "/favicon.ico" : "",
+          icon: typeof window !== "undefined" ? `${window.location.origin}/favicon.ico` : "",
         },
         redirectTo: "/",
         onFinish: () => {
