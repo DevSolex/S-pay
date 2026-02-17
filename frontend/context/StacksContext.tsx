@@ -6,6 +6,7 @@ import {
   UserSession,
   showConnect,
   openContractCall,
+  openSTXTransfer,
 } from "@stacks/connect";
 import { StacksMainnet } from "@stacks/network";
 
@@ -32,6 +33,7 @@ interface StacksContextType {
   handleDisconnect: () => void;
   network: unknown;
   callContract: (options: ContractCallBase) => void;
+  transferStx: (recipient: string, amountMicroStx: bigint) => void;
 }
 
 const StacksContext = createContext<StacksContextType | undefined>(undefined);
@@ -78,6 +80,17 @@ export function StacksProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const transferStx = (recipient: string, amountMicroStx: bigint) => {
+    openSTXTransfer({
+      recipient,
+      amount: amountMicroStx,
+      userSession,
+      network,
+      onFinish: () => {},
+      onCancel: () => {},
+    });
+  };
+
   return (
     <StacksContext.Provider
       value={{
@@ -87,6 +100,7 @@ export function StacksProvider({ children }: { children: React.ReactNode }) {
         handleDisconnect,
         network,
         callContract,
+        transferStx,
       }}
     >
       {children}
