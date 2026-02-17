@@ -2,8 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AppConfig, UserSession, showConnect } from '@stacks/connect';
-import stacksNetwork from '@stacks/network';
-const { STACKS_MAINNET } = stacksNetwork;
+import { StacksMainnet } from '@stacks/network';
 
 export interface StacksUserData {
   profile: {
@@ -29,7 +28,7 @@ export function StacksProvider({ children }: { children: React.ReactNode }) {
   
   const appConfig = new AppConfig(['store_write', 'publish_data']);
   const userSession = new UserSession({ appConfig });
-  const network = STACKS_MAINNET;
+  const network = new StacksMainnet();
 
   useEffect(() => {
     if (userSession.isUserSignedIn()) {

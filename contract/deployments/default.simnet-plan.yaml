@@ -64,18 +64,13 @@ plan:
     - id: 0
       transactions:
         - emulated-contract-publish:
-            contract-name: sip-010-trait
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/sip-010-trait.clar
-            clarity-version: 2
-        - emulated-contract-publish:
-            contract-name: ltc
-            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/ltc.clar
-            clarity-version: 2
-        - emulated-contract-publish:
             contract-name: s-pay
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: contracts/s-pay.clar
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: sip-010-trait
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/sip-010-trait.clar
             clarity-version: 2
       epoch: "3.3"

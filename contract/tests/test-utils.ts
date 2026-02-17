@@ -25,16 +25,6 @@ export function processTestPayment(simnet, merchant, customer, amount, memo) {
         [Cl.principal(merchant), Cl.uint(amount), Cl.stringAscii(memo)], customer);
 }
 
-export function mintTestTokens(simnet, recipient, amount, deployer) {
-    return simnet.callPublicFn("ltc", "mint",
-        [Cl.uint(amount), Cl.principal(recipient)], deployer);
-}
-
-export function transferTestTokens(simnet, sender, recipient, amount) {
-    return simnet.callPublicFn("ltc", "transfer",
-        [Cl.uint(amount), Cl.principal(sender), Cl.principal(recipient), Cl.none()], sender);
-}
-
 export function depositToVault(simnet, wallet, amount) {
     return simnet.callPublicFn("s-pay", "vault-deposit", [Cl.uint(amount)], wallet);
 }

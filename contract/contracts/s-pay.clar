@@ -76,6 +76,11 @@
     }
 )
 
+;; @desc Get total registered user count
+(define-read-only (get-total-users)
+    (ok (var-get user-nonce))
+)
+
 ;; Error Constants
 (define-constant ERR-UNAUTHORIZED (err u100))
 (define-constant ERR-NOT-OWNER (err u101))
@@ -104,7 +109,7 @@
 (define-constant MERCHANT-VERIFICATION-STAKE u50000000) ;; 50 STX stake for high-tier merchants
 
 ;; Operational Variables
-(define-constant CONTRACT-VERSION "1.0.0")
+(define-constant CONTRACT-VERSION "1.1.0")
 (define-constant PLATFORM-TAG "SPAY-PROTO")
 
 ;; --- Data Variables ---

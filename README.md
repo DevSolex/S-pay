@@ -12,28 +12,25 @@ S-pay is a premium, decentralized payment gateway built on the Stacks blockchain
 
 ## Project Structure
 
-- `contracts/`: Clarity smart contracts for the S-pay protocol and tokens.
-- `frontend/`: Next.js merchant dashboard.
-- `scripts/`: Utility scripts for deployment and contract interaction.
-- `tests/`: Vitest and Clarinet test suites.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v18+)
-- Clarinet (for contract development)
-- A Stacks wallet (Mainnet)
+```
+S-pay/
+├── contract/     # Clarity contracts, tests, deploy scripts
+│   ├── contracts/
+│   ├── scripts/
+│   ├── tests/
+│   └── deploy.js
+└── frontend/     # Next.js merchant dashboard
+```
 
 ### Installation
 
 1. Clone the repository.
 2. Install dependencies:
    ```bash
-   npm install
-   cd frontend && npm install
+   cd contract && npm install
+   cd ../frontend && npm install
    ```
-3. Set up your environment variables:
+3. Set up environment variables (at root):
    ```bash
    cp .env.template .env
    ```
@@ -41,15 +38,16 @@ S-pay is a premium, decentralized payment gateway built on the Stacks blockchain
 ### Running the Frontend
 
 ```bash
-cd frontend
 npm run dev
 ```
+Or: `cd frontend && npm run dev`
 
-## Deployment
+### Contract Commands
 
-Deploy contracts using the provided deployment scripts:
 ```bash
-node deploy.js
+npm run deploy    # Deploy to mainnet
+npm run check     # Verify contracts (clarinet check)
+npm run test      # Run contract tests
 ```
 
 ## License

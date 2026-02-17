@@ -1,39 +1,15 @@
 {
-  "name": "S-pay-tests",
+  "name": "s-pay",
   "version": "1.0.0",
-  "description": "Run unit tests on this project.",
-  "type": "module",
+  "description": "S-pay payment protocol",
   "private": true,
   "scripts": {
-    "test": "vitest run",
-    "test:report": "vitest run -- --coverage --costs",
-    "test:watch": "chokidar \"tests/**/*.ts\" \"contracts/**/*.clar\" -c \"npm run test:report\"",
-    "lint": "eslint scripts/**/*.js tests/**/*.ts",
-    "lint:fix": "eslint scripts/**/*.js tests/**/*.ts --fix",
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "deploy": "cd contract && npm run deploy",
+    "check": "cd contract && npm run check",
+    "test": "cd contract && npm run test",
     "format": "prettier --write \"**/*.{js,ts,json}\"",
-    "format:check": "prettier --check \"**/*.{js,ts,json}\"",
-    "deploy": "node deploy.js",
-    "check": "clarinet check",
-    "balance": "node scripts/balance-checker.js",
-    "merchant:stats": "node scripts/merchant-stats.js",
-    "user:lookup": "node scripts/user-lookup.js",
-    "payment:history": "node scripts/payment-history.js",
-    "vault:summary": "node scripts/vault-summary.js",
-    "token:distribute": "node scripts/token-distribution.js",
-    "metrics": "node scripts/metrics-dashboard.js",
-    "backup": "node scripts/backup.js",
-    "migrate": "node scripts/migration-helper.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@stacks/clarinet-sdk": "^3.9.0",
-    "@stacks/network": "^7.3.1",
-    "@stacks/transactions": "^7.3.1",
-    "@types/node": "^24.4.0",
-    "chokidar-cli": "^3.0.0",
-    "dotenv": "^17.2.4",
-    "vitest": "^4.0.7",
-    "vitest-environment-clarinet": "^3.0.0"
+    "format:check": "prettier --check \"**/*.{js,ts,json}\""
   }
 }

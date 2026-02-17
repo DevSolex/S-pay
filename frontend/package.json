@@ -12,7 +12,7 @@
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
-    "@stacks/connect": "^21.0.0",
+    "@stacks/connect": "^8.2.4",
     "@stacks/network": "^6.5.5",
     "@stacks/transactions": "^6.10.0",
     "lucide-react": "^0.378.0"
