@@ -11,3 +11,4 @@ export function isValidPrincipal(addr: string): boolean {
   return /^S[PM2][0-9A-Z]{38}$/.test(addr);
 }
 // S-pay commit 23
+// S-pay commit 24
