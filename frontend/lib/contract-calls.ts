@@ -61,3 +61,12 @@ export function buildMerchantWithdrawOptions(amount: bigint | number) {
     functionArgs: [uintCV(amount)],
   };
 }
+
+export function buildReclaimStakeOptions() {
+  return {
+    contractAddress: SPAY_CONTRACT.address,
+    contractName: SPAY_CONTRACT.name,
+    functionName: "reclaim-stake",
+    functionArgs: [],
+  };
+}
