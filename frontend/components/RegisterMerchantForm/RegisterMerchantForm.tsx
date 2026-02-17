@@ -34,6 +34,7 @@ export function RegisterMerchantForm() {
       <input
         type="url"
         value={website}
+        aria-label="Website URL"
         onChange={(e) => setWebsite(e.target.value)}
         placeholder="Website (max 128 chars)"
         maxLength={128}
