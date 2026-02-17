@@ -49,6 +49,21 @@
   color: var(--foreground);
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.address {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--foreground);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+}
+
 .connectBtn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);

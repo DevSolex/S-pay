@@ -48,39 +48,6 @@
   line-height: 1.6;
 }
 
-.actions {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-}
-
-.primaryBtn {
-  background: var(--primary);
-  color: white;
-  padding: 1rem 2.5rem;
-  border-radius: 12px;
-  font-weight: 600;
-  transition: var(--transition-smooth);
-}
-
-.primaryBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px var(--primary-glow);
-}
-
-.secondaryBtn {
-  border: 1px solid var(--glass-border);
-  color: var(--foreground);
-  padding: 1rem 2.5rem;
-  border-radius: 12px;
-  font-weight: 600;
-  transition: var(--transition-smooth);
-}
-
-.secondaryBtn:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
 @media (max-width: 768px) {
   .title {
     font-size: 3rem;
