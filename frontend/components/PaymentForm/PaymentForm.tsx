@@ -35,7 +35,7 @@ export function PaymentForm() {
         type="text"
         value={recipient}
         onChange={(e) => setRecipient(e.target.value)}
-        placeholder="Recipient principal"
+        placeholder="SP..."
         className={styles.input}
       />
       <input

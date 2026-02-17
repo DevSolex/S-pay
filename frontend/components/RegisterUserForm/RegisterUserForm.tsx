@@ -37,7 +37,7 @@ export function RegisterUserForm() {
         type="text"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
-        placeholder="Username (max 24 chars)"
+        placeholder="my-username"
         maxLength={24}
         className={styles.input}
       />
