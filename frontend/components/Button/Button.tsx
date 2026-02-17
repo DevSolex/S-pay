@@ -23,18 +23,3 @@ export default function Button({
     </button>
   );
 }
-// Feature extension 36
-// Feature extension 37
-// Feature extension 38
-// Feature extension 39
-// Feature extension 40
-// Feature extension 41
-// Feature extension 42
-// Feature extension 43
-// Feature extension 44
-// Feature extension 45
-// Feature extension 46
-// Feature extension 47
-// Feature extension 48
-// Feature extension 49
-// Feature extension 50

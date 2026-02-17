@@ -25,6 +25,7 @@ export function RegisterMerchantForm() {
       <input
         type="text"
         value={businessName}
+        aria-label="Business name"
         onChange={(e) => setBusinessName(e.target.value)}
         placeholder="Business name (max 64 chars)"
         maxLength={64}
@@ -33,6 +34,7 @@ export function RegisterMerchantForm() {
       <input
         type="url"
         value={website}
+        aria-label="Website URL"
         onChange={(e) => setWebsite(e.target.value)}
         placeholder="Website (max 128 chars)"
         maxLength={128}

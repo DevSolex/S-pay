@@ -8,7 +8,7 @@ export default function VaultPage() {
     <div className={styles.page}>
       <h1 className={styles.title}>Vault Deposit</h1>
       <p className={styles.subtitle}>
-        Deposit STX to your S-pay vault (vault-deposit)
+        Deposit STX to your S-pay vault. Minimum 0.000001 STX.
       </p>
       <VaultDepositForm />
     </div>

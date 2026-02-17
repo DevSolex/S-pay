@@ -24,3 +24,9 @@
   color: #a0a0aa;
   font-size: 0.9rem;
 }
+
+.error {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin: 0;
+}

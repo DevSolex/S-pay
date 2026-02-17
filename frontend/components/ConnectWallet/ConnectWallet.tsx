@@ -1,24 +1,45 @@
 "use client";
 
+import { useState } from "react";
 import { useStacks } from "@/context/StacksContext";
+import { shortenAddress } from "@/lib/utils";
 import styles from "./ConnectWallet.module.css";
 
 export function ConnectWallet() {
   const { address, handleConnect, handleDisconnect } = useStacks();
+  const [connecting, setConnecting] = useState(false);
+
+  const onConnect = async () => {
+    setConnecting(true);
+    try {
+      await handleConnect();
+    } finally {
+      setConnecting(false);
+    }
+  };
 
   return (
     <div className={styles.actions}>
       {address ? (
         <>
-          <span className={styles.address}>{address.slice(0, 6)}…{address.slice(-4)}</span>
-          <button className={styles.secondaryBtn} onClick={handleDisconnect}>
+          <span className={styles.address}>{shortenAddress(address)}</span>
+          <button
+            className={styles.secondaryBtn}
+            onClick={handleDisconnect}
+            aria-label="Disconnect wallet"
+          >
             Disconnect
           </button>
         </>
       ) : (
         <>
-          <button className={styles.primaryBtn} onClick={handleConnect}>
-            Connect Wallet
+          <button
+            className={styles.primaryBtn}
+            onClick={onConnect}
+            disabled={connecting}
+            aria-label="Connect wallet"
+          >
+            {connecting ? "Connecting…" : "Connect Wallet"}
           </button>
           <button className={styles.secondaryBtn}>Learn More</button>
         </>

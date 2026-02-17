@@ -8,7 +8,7 @@ export default function MerchantRegisterPage() {
     <div className={styles.page}>
       <h1 className={styles.title}>Register as Merchant</h1>
       <p className={styles.subtitle}>
-        Requires 50 STX verification stake (register-merchant)
+        Requires 50 STX verification stake. Refundable after verification.
       </p>
       <RegisterMerchantForm />
     </div>

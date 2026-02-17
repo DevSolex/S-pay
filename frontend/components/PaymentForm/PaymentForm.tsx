@@ -2,26 +2,40 @@
 
 import { useState } from "react";
 import { useProcessPayment } from "@/hooks/useProcessPayment";
+import { isValidPrincipal } from "@/lib/utils";
 import styles from "./PaymentForm.module.css";
+
+const MIN_STX = 1;
 
 export function PaymentForm() {
   const [recipient, setRecipient] = useState("");
   const [amountStx, setAmountStx] = useState("");
+  const [error, setError] = useState("");
   const { processPayment } = useProcessPayment();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    if (!isValidPrincipal(recipient.trim())) {
+      setError("Invalid Stacks address");
+      return;
+    }
     const amount = BigInt(Math.floor(parseFloat(amountStx || "0") * 1e6));
-    if (recipient && amount > BigInt(0)) processPayment(amount, recipient);
+    if (amount < BigInt(MIN_STX * 1e6)) {
+      setError(`Minimum ${MIN_STX} STX`);
+      return;
+    }
+    processPayment(amount, recipient.trim());
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
+      {error && <p className={styles.error}>{error}</p>}
       <input
         type="text"
         value={recipient}
         onChange={(e) => setRecipient(e.target.value)}
-        placeholder="Recipient principal"
+        placeholder="SP..."
         className={styles.input}
       />
       <input

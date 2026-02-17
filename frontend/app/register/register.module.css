@@ -14,5 +14,15 @@
 
 .subtitle {
   color: #a0a0aa;
+  margin-bottom: 1rem;
+}
+
+.cta {
+  color: var(--primary);
   margin-bottom: 2rem;
+}
+
+.cta a {
+  color: inherit;
+  text-decoration: underline;
 }
