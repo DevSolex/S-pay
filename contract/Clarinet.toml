@@ -13,6 +13,10 @@ epoch = 'latest'
 path = 'contracts/s-pay.clar'
 clarity_version = 2
 epoch = 'latest'
+[contracts.payer-token]
+path = 'contracts/payer-token.clar'
+clarity_version = 2
+epoch = 'latest'
 [repl.analysis]
 passes = ['check_checker']
 
