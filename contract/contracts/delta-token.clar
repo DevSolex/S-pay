@@ -1,0 +1,29 @@
+;; delta-token.clar
+(impl-trait .sip-010-trait.sip-010-trait)
+(define-fungible-token delta-token)
+(define-constant contract-owner tx-sender)
+(define-constant ERR-NOT-OWNER (err u100))
+(define-constant ERR-NOT-AUTHORIZED (err u101))
+
+(define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
+    (begin
+        (asserts! (or (is-eq tx-sender sender) (is-eq contract-caller sender)) ERR-NOT-AUTHORIZED)
+        (try! (ft-transfer? delta-token amount sender recipient))
+        (match memo to-print (print to-print) 0x)
+        (ok true)
+    )
+)
+
+(define-read-only (get-name) (ok "DELTA Token"))
+(define-read-only (get-symbol) (ok "DELTA"))
+(define-read-only (get-decimals) (ok u6))
+(define-read-only (get-balance (who principal)) (ok (ft-get-balance delta-token who)))
+(define-read-only (get-total-supply) (ok (ft-get-supply delta-token)))
+(define-read-only (get-token-uri) (ok none))
+
+(define-public (mint (amount uint) (recipient principal))
+    (begin
+        (asserts! (is-eq tx-sender contract-owner) ERR-NOT-OWNER)
+        (ft-mint? delta-token amount recipient)
+    )
+)
