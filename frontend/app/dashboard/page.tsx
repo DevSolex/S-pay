@@ -1,61 +1,52 @@
-"use client";
+'use client';
 
-import { ArrowRight } from "lucide-react";
-import Sidebar from "@/components/Sidebar/Sidebar";
-import StatsGrid from "@/components/Dashboard/StatsGrid";
-import GlassCard from "@/components/GlassCard/GlassCard";
-import TransactionTable from "@/components/TransactionTable/TransactionTable";
-import styles from "./Dashboard.module.css";
-import Button from "@/components/Button/Button";
-import { useDashboardData } from "@/hooks/useDashboardData";
+import ConnectButton from '@/components/ConnectButton';
+import ProtocolStats from '@/components/ProtocolStats';
+import RegisterUserForm from '@/components/RegisterUserForm';
+import RegisterMerchantForm from '@/components/RegisterMerchantForm';
+import PaymentForm from '@/components/PaymentForm';
+import VaultManager from '@/components/VaultManager';
+import UserProfile from '@/components/UserProfile';
+import MerchantProfile from '@/components/MerchantProfile';
 
-export default function Dashboard() {
-  const { stats, tokens, loading } = useDashboardData();
-
-  if (loading) {
-    return (
-      <div className={styles.loading}>
-        <div className={styles.spinner} />
-      </div>
-    );
-  }
-
+export default function DashboardPage() {
   return (
-    <div className={styles.layout}>
-      <Sidebar />
-      <main className={styles.main}>
-        <header className={styles.header}>
-          <div>
-            <h1 className={styles.greeting}>Welcome back, Merchant</h1>
-            <p className={styles.subtext}>Everything is looking good today.</p>
-          </div>
-          <Button variant="primary">Generate Payment Link</Button>
-        </header>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold">Payment VM Dashboard</h1>
+        <ConnectButton />
+      </div>
 
-        <StatsGrid stats={stats} />
+      <div className="mb-8">
+        <ProtocolStats />
+      </div>
 
-        <section className={styles.bottomGrid}>
-          <GlassCard className={styles.transactions}>
-            <div className={styles.sectionHeader}>
-              <h2>Recent Activity</h2>
-              <button className={styles.viewAll}>View All <ArrowRight size={16} /></button>
-            </div>
-            <TransactionTable />
-          </GlassCard>
+      <div className="grid md:grid-cols-2 gap-8 mb-8">
+        <UserProfile />
+        <MerchantProfile />
+      </div>
 
-          <GlassCard className={styles.quickActions}>
-            <h2>Active Tokens</h2>
-            <div className={styles.tokenList}>
-              {tokens.map(token => (
-                <div key={token.symbol} className={styles.tokenItem}>
-                  <span>{token.symbol}</span>
-                  <span className={styles.badge}>{token.status}</span>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-        </section>
-      </main>
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="p-6 bg-white rounded shadow">
+          <h3 className="text-xl font-bold mb-4">Register User</h3>
+          <RegisterUserForm />
+        </div>
+
+        <div className="p-6 bg-white rounded shadow">
+          <h3 className="text-xl font-bold mb-4">Register Merchant</h3>
+          <RegisterMerchantForm />
+        </div>
+
+        <div className="p-6 bg-white rounded shadow">
+          <h3 className="text-xl font-bold mb-4">Send Payment</h3>
+          <PaymentForm />
+        </div>
+
+        <div className="p-6 bg-white rounded shadow">
+          <h3 className="text-xl font-bold mb-4">Vault Manager</h3>
+          <VaultManager />
+        </div>
+      </div>
     </div>
   );
 }
