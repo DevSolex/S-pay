@@ -1,22 +1,19 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { useStacks } from "@/context/StacksContext";
-import { getProtocolStatus } from "@/lib/read-only";
+import { useState, useEffect } from 'react';
+import { getProtocolStatus } from '@/services/protocol';
 
 export function useProtocolStatus() {
-  const { address } = useStacks();
-  const [status, setStatus] = useState<unknown>(null);
-
-  const fetchStatus = useCallback(async () => {
-    const sender = address ?? "SP2DBFGMT7SATSJPCCA38SDDPBNNQ86QWADJ3E6WT";
-    const result = await getProtocolStatus(sender);
-    setStatus(result);
-  }, [address]);
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchStatus();
-  }, [fetchStatus]);
+    getProtocolStatus()
+      .then(setData)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
 
-  return { status, refetch: fetchStatus };
+  return { data, loading, error };
 }
