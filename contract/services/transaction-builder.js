@@ -79,7 +79,7 @@ class TransactionBuilder {
     }
 
     return this.reset()
-      .setContract(contractAddress, 's-pay')
+      .setContract(contractAddress, 'payment-vm')
       .setFunction('register-user')
       .addArg(username)
       .build();
@@ -97,7 +97,7 @@ class TransactionBuilder {
     }
 
     return this.reset()
-      .setContract(contractAddress, 's-pay')
+      .setContract(contractAddress, 'payment-vm')
       .setFunction('register-merchant')
       .addArg(businessName)
       .addArg(amountValidation.value)
@@ -116,7 +116,7 @@ class TransactionBuilder {
     }
 
     return this.reset()
-      .setContract(contractAddress, 's-pay')
+      .setContract(contractAddress, 'payment-vm')
       .setFunction('process-payment')
       .addArg(merchantAddress)
       .addArg(amountValidation.value)

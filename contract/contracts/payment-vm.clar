@@ -1,4 +1,4 @@
-;; title: s-pay
+;; title: payment-vm
 ;; version:
 ;; summary:
 ;; description:

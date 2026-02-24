@@ -9,8 +9,8 @@ requirements = []
 path = 'contracts/sip-010-trait.clar'
 clarity_version = 2
 epoch = 'latest'
-[contracts.s-pay]
-path = 'contracts/s-pay.clar'
+[contracts.payment-vm]
+path = 'contracts/payment-vm.clar'
 clarity_version = 2
 epoch = 'latest'
 [contracts.payer-token]

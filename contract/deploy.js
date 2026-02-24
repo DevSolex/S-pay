@@ -26,7 +26,14 @@ console.log(`Deploying from address: ${address}`);
 async function getNextNonce(addr) {
     console.log(`Fetching next nonce for ${addr}...`);
     try {
-        const response = await fetch(`https://api.mainnet.hiro.so/extended/v1/address/${addr}/nonces`);
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000);
+        
+        const response = await fetch(`https://api.mainnet.hiro.so/extended/v1/address/${addr}/nonces`, {
+            signal: controller.signal
+        });
+        clearTimeout(timeout);
+        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -96,11 +103,11 @@ async function runDeployments() {
 
     // 2. Deploy Main Contract
     console.log("\n--- Deploying Main Contract ---");
-    const mainContractTxId = await deployContract('s-pay-v3', 'contracts/s-pay.clar', 100000n, currentNonce);
+    const mainContractTxId = await deployContract('payment-vm', 'contracts/payment-vm.clar', 100000n, currentNonce);
     
     if (mainContractTxId && mainContractTxId !== 'EXISTS') {
         console.log("\nMain Contract deployment broadcast successfully!");
-        console.log(`s-pay-v3: https://explorer.hiro.so/txid/0x${mainContractTxId}?chain=mainnet`);
+        console.log(`payment-vm: https://explorer.hiro.so/txid/0x${mainContractTxId}?chain=mainnet`);
     } else if (mainContractTxId === 'EXISTS') {
         console.log("\nMain contract already exists.");
     }
