@@ -1,33 +1,22 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { principalCV } from "@stacks/transactions";
-import { useStacks } from "@/context/StacksContext";
-import { callReadOnly } from "@/lib/read-only";
+import { useState, useEffect } from 'react';
+import { getUserData } from '@/services/user';
 
-export function useUserData() {
-  const { address } = useStacks();
-  const [data, setData] = useState<unknown>(null);
+export function useUserData(address: string | null) {
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-
-  const fetchUserData = useCallback(async () => {
-    if (!address) return;
-    setLoading(true);
-    try {
-      const result = await callReadOnly(
-        "get-user-data",
-        [principalCV(address)],
-        address
-      );
-      setData(result);
-    } finally {
-      setLoading(false);
-    }
-  }, [address]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
+    if (!address) return;
 
-  return { userData: data, loading, refetch: fetchUserData };
+    setLoading(true);
+    getUserData(address)
+      .then(setData)
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [address]);
+
+  return { data, loading, error };
 }
