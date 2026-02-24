@@ -1,37 +1,45 @@
-import { useState, useCallback } from 'react';
-import { walletService } from '@/services';
-import type { ContractCallResult } from '@/types';
+'use client';
+
+import { useState } from 'react';
+import { openContractCall } from '@stacks/connect';
+import { PostConditionMode, AnchorMode, ClarityValue } from '@stacks/transactions';
+import { getStacksNetwork } from '@/lib/stacks-network';
+import { CONTRACT_ADDRESS, CONTRACT_NAME } from '@/config/network';
 
 export function useContractCall() {
   const [loading, setLoading] = useState(false);
+  const [txId, setTxId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<ContractCallResult | null>(null);
 
-  const execute = useCallback(async (
-    fn: () => Promise<any>
-  ): Promise<ContractCallResult> => {
+  const call = async (functionName: string, functionArgs: ClarityValue[]) => {
     setLoading(true);
     setError(null);
     
     try {
-      const data = await fn();
-      const result = { txId: data.txId, success: true };
-      setResult(result);
-      return result;
-    } catch (err) {
-      const error = err instanceof Error ? err.message : 'Transaction failed';
-      setError(error);
-      return { txId: '', success: false, error };
-    } finally {
+      const network = getStacksNetwork();
+      
+      await openContractCall({
+        network,
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName,
+        functionArgs,
+        postConditionMode: PostConditionMode.Allow,
+        anchorMode: AnchorMode.Any,
+        onFinish: (data) => {
+          setTxId(data.txId);
+          setLoading(false);
+        },
+        onCancel: () => {
+          setError('Transaction cancelled');
+          setLoading(false);
+        },
+      });
+    } catch (e: any) {
+      setError(e.message);
       setLoading(false);
     }
-  }, []);
+  };
 
-  const reset = useCallback(() => {
-    setLoading(false);
-    setError(null);
-    setResult(null);
-  }, []);
-
-  return { execute, loading, error, result, reset };
+  return { call, loading, txId, error };
 }
